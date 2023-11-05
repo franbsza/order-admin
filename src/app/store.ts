@@ -2,11 +2,21 @@ import {
     configureStore, 
     ThunkAction, 
     Action } from '@reduxjs/toolkit';
-
+import { ordersApiSlice } from '../features/orders/SliceOrder';
+import { vehiclesApiSlice } from '../features/vehicle/SliceVehicle';
+import { apiSlice } from '../features/api/apiSlice';
 
     export const store =  configureStore({
         reducer: {
-        }
+            [apiSlice.reducerPath]: apiSlice.reducer,
+            [ordersApiSlice.reducerPath]: apiSlice.reducer,
+            [vehiclesApiSlice.reducerPath]: apiSlice.reducer,
+        },
+        middleware: (getDefaultMiddleware) => {
+            return getDefaultMiddleware({
+              serializableCheck: false,
+            }).concat(apiSlice.middleware);
+          }
     })
     
     export type AppDispatch = typeof store.dispatch;
