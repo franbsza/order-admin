@@ -5,6 +5,7 @@ import { useGetVehiclesQuery } from '../vehicle/SliceVehicle';
 import { OrderRequest} from '../../types/Order';
 import { useSnackbar } from 'notistack';
 import { OrderForm } from './components/OrderForm';
+import { InputError } from '../../types/InputError';
 
 export const CreateOrder = () => {
 
@@ -17,13 +18,19 @@ export const CreateOrder = () => {
   const [orderState, setOrderState] = useState<OrderRequest>({
     serviceId: 1,
     addressId: 1,
-    vehicleId: 1,
+    vehicleId: 0,
     orderStatus: "OPEN",
     period: "", 
     dateTime: new Date(),
     description: ""
   });
 
+  const [inputError, setInputError] = useState<InputError>({
+    vehicleIdError: false,
+    dateTimeError: false,
+    periodError: false
+  })
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setOrderState({ ...orderState, [name]: value });
@@ -31,16 +38,65 @@ export const CreateOrder = () => {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>){
     e.preventDefault();
-    await createOrder(orderState);
+
+    setInputError({...inputError, 
+      vehicleIdError:false, 
+      periodError: false, 
+      dateTimeError: false
+    });
+    var isValid = true;
+
+    console.log(orderState.vehicleId)
+
+    if(orderState.vehicleId === 0){
+      
+      setInputError({...inputError, vehicleIdError: true})
+      isValid = false;
+    }
+    if (orderState.period === "") {
+      setInputError({...inputError, periodError: true})
+      isValid = false;
+    }
+    if (orderState.dateTime === null) {
+      setInputError({...inputError, dateTimeError: true})
+      isValid = false;
+    }
+    if(isValid){
+      await createOrder(orderState);
+    }
   };
 
   const hadleSelectChange = (e: SelectChangeEvent<String>) => {
     const { name, value } = e.target;
+
+    setInputError({...inputError, 
+      periodError: false, 
+    });
+    if(value === ""){
+      setInputError({...inputError, periodError: true})
+      console.log(inputError.periodError);
+    }
+    else{
+      setInputError({...inputError, periodError: false})
+      console.log(inputError.periodError);
+    }
     setOrderState({ ...orderState, [name]: value });
   };
 
   const hadleSelectChangeNumber = (e: SelectChangeEvent<Number>) => {
     const { name, value } = e.target;
+
+    setInputError({...inputError, 
+      vehicleIdError:false
+    });
+    if(value === 0){
+      setInputError({...inputError, vehicleIdError: true})
+      console.log(inputError.vehicleIdError);
+    }
+    else{
+      setInputError({...inputError, vehicleIdError: false})
+      console.log(inputError.vehicleIdError);
+    }
     setOrderState({ ...orderState, [name]: value });
     setVehicleId(value as number);
   };
@@ -84,6 +140,7 @@ export const CreateOrder = () => {
           hadleSelectChangeNumber={hadleSelectChangeNumber}
           handleDateChange={handleDateChange}
           vehicleId={vehicleId}
+          inputError={inputError}
           />
         </Paper>
       </Box>

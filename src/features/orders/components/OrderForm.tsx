@@ -13,6 +13,7 @@ import {
   import { OrderRequest } from '../../../types/Order';
   import { Vehicle, VehicleResponse } from '../../../types/Vehicle';
   import { DatePicker } from '@mui/x-date-pickers';
+import { InputError } from '../../../types/InputError';
   
   type Props = {
       order: OrderRequest;
@@ -25,6 +26,7 @@ import {
       hadleSelectChangeNumber: (e: SelectChangeEvent<Number>) => void;
       handleDateChange : (value: Date | null) => void;
       vehicleId: Number;
+      inputError: InputError;
     }
   
   export function OrderForm({
@@ -37,7 +39,8 @@ import {
       hadleSelectChange,
       hadleSelectChangeNumber,
       handleDateChange,
-      vehicleId
+      vehicleId,
+      inputError
   }: Props) {
 
     function mapDataToGridRows(vehicleResponse: VehicleResponse) {
@@ -49,13 +52,7 @@ import {
         }));
       }
 
-      const vehicle: Vehicle = {
-        id: 0,
-        name: 'Indefinido',
-        isActive: false
-      }
-
-      const vehicleList = vehicleResponse ? mapDataToGridRows(vehicleResponse) : [vehicle];
+      const vehicleList = vehicleResponse ? mapDataToGridRows(vehicleResponse) : [];
 
       return (
         
@@ -76,10 +73,13 @@ import {
                     name="vehicleId"
                     value={vehicleId} 
                     onChange={hadleSelectChangeNumber}
+                    error={inputError.vehicleIdError}
                     >
-                    <MenuItem value={0} selected={true}>Selecione</MenuItem>
-
-                    {vehicleList.map(vehicle => {
+                    <MenuItem key={0} value={0} selected={true}>
+                      {vehicleList.length === 0 ? "Sem veículo cadastrado" : "Selecione"}
+                    </MenuItem>
+                    {
+                    vehicleList.map(vehicle => {
                         return (
                             <MenuItem key={vehicle.id} value={vehicle.id}> 
                             <em> {vehicle.name}</em>
@@ -95,7 +95,7 @@ import {
                   <FormControl sx={{ m: 1, width: 300 }}>
                     <DatePicker 
                     disablePast={true}
-                    onChange={handleDateChange}  
+                    onChange={handleDateChange}
                     />
                     <FormHelperText>Selecione a data</FormHelperText>
                   </FormControl>
@@ -109,12 +109,14 @@ import {
                     name="period"
                     displayEmpty
                     value={order.period} 
-                    onChange={hadleSelectChange} >
-                    <MenuItem value="" selected={true}>Selecione</MenuItem>
-                    <MenuItem value="MORNING" selected={true}>
+                    onChange={hadleSelectChange} 
+                    error={inputError.periodError}
+                    >
+                    <MenuItem key="0" value="" selected={true}>Selecione</MenuItem>
+                    <MenuItem key="1" value="MORNING" selected={true}>
                       <em>Manhã</em>
                     </MenuItem>      
-                    <MenuItem value="AFTERNOON">
+                    <MenuItem key="2" value="AFTERNOON">
                       <em>Tarde</em>
                     </MenuItem>              
                   </Select>
