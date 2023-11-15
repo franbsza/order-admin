@@ -5,12 +5,14 @@ import {
 import { ordersApiSlice } from '../features/orders/SliceOrder';
 import { vehiclesApiSlice } from '../features/vehicle/SliceVehicle';
 import { apiSlice } from '../features/api/apiSlice';
+import { authSlice } from '../features/auth/SliceAuth';
 
     export const store =  configureStore({
         reducer: {
             [apiSlice.reducerPath]: apiSlice.reducer,
             [ordersApiSlice.reducerPath]: apiSlice.reducer,
             [vehiclesApiSlice.reducerPath]: apiSlice.reducer,
+            auth: authSlice.reducer,
         },
         middleware: (getDefaultMiddleware) => {
             return getDefaultMiddleware({

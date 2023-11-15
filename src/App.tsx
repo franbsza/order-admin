@@ -11,44 +11,22 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { CreateOrder } from './features/orders/CreateOrder';
 import { ListOrders } from './features/orders/ListOrders';
 import { ProtectedRoutes } from './components/ProtectedRoutes';
-<<<<<<< Updated upstream
-=======
-import keycloak from "./config/keycloak"
-import { selectRoles } from './features/auth/SliceAuth';
 
->>>>>>> Stashed changes
-
-function EditOrder(){
-  return (
-    <Box>
-      <Typography variant="h1" component="h1">Edit Order</Typography>
-    </Box>
-  )
-};
-
-<<<<<<< Updated upstream
-=======
-
-
->>>>>>> Stashed changes
 function App(){
 
   return (
-
-    
-
     <LocalizationProvider dateAdapter={AdapterDayjs}>
     <ThemeProvider theme={ appTheme }>
       <SnackbarProvider 
-          maxSnack={3}
-          anchorOrigin={{
-          vertical: 'top', 
-          horizontal: 'center'}}
-          autoHideDuration={3000}
-          >
+        maxSnack={3}
+        anchorOrigin={{
+        vertical: 'top', 
+        horizontal: 'center'}}
+        autoHideDuration={3000}
+        >
       <Box 
-      component="main" 
-      sx={{ 
+        component="main" 
+        sx={{ 
         height: '100vh',
         backgroundColor: (theme) => theme.palette.background.default, 
          }}>
@@ -56,53 +34,50 @@ function App(){
       <Header />
 
       <Layout>
+        <Routes>
+          <Route 
+            path="/" 
+            element={
+            <ProtectedRoutes 
+              rolesPropos={["USER"]}> 
+              <ListOrders /> 
+            </ProtectedRoutes>
+          }/>
 
-          <Routes>
-        
-<<<<<<< Updated upstream
-             <Route path="/" 
-             element={<ProtectedRoutes 
-             roles={["ADMIN, USER, STAFF"]}> 
-             <ListOrders /> 
-             </ProtectedRoutes>} />
-
-            <Route path="/orders" 
-            element={<ProtectedRoutes 
-            roles={["ADMIN, USER, STAFF"]}>
+          <Route 
+            path="/orders" 
+            element={
+            <ProtectedRoutes 
+              rolesPropos={["USER"]}>
               <ListOrders />
-            </ProtectedRoutes>} />
+            </ProtectedRoutes>
+          }/>
 
-            <Route path="/orders/create" 
-            element={<ProtectedRoutes 
-            roles={["ADMIN, USER, STAFF"]}>
+          <Route 
+            path="/orders/create" 
+            element={
+            <ProtectedRoutes 
+              rolesPropos={["USER"]}>
               <CreateOrder />
-            </ProtectedRoutes>} />
+            </ProtectedRoutes>
+          }/>
 
-            <Route path="/orders/edit/:id" 
-            element={<ProtectedRoutes 
-            roles={["ADMIN, USER, STAFF"]}>
-              <EditOrder />
-            </ProtectedRoutes>} />
-
-            <Route path='*' element={
-               <Box>
-                <Typography variant="h1" component="h1">404</Typography>
-               <Typography variant="h1" component="h1">Page not found</Typography>
-            </Box>
+          <Route 
+            path='*' 
+            element={
+              <Box>
+                <Typography 
+                  variant="h1" 
+                  component="h1">
+                    404
+                </Typography>
+                <Typography 
+                  variant="h1" 
+                  component="h1">
+                    Page not found
+                </Typography>
+              </Box>
             }/>
-=======
-             <Route path="/" element={   <ProtectedRoutes roles={["ADMIN"]}> <ListOrders /> </ProtectedRoutes>} />
-            <Route path="/orders" element={<ProtectedRoutes><ListOrders /></ProtectedRoutes>} />
-            <Route path="/orders/create" element={<ProtectedRoutes><CreateOrder /></ProtectedRoutes>} />
-            <Route path="/orders/edit/:id" element={<ProtectedRoutes><EditOrder /></ProtectedRoutes>} />
-            {/* <Route path="/login" element={<Login />} /> */}
-            {/* <Route path='*' element={
-               <Box>
-                <Typography variant="h1" component="h1">404</Typography>
-               <Typography variant="h1" component="h1">Page not found</Typography>
-             </Box>
-            } /> */}
->>>>>>> Stashed changes
           </Routes>
       </Layout>    
       </Box>

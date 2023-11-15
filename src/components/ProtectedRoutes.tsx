@@ -1,33 +1,36 @@
-
 import React from "react";
-import { useSelector } from "react-redux";
 import { Navigate, useLocation } from "react-router-dom";
-import { RootState } from "../app/store";
+import { AccessDenied } from "../features/auth/AccessDenied";
 
 export const ProtectedRoutes = ({
   children,
-  roles,
+  rolesPropos,
 }: {
   children: React.ReactNode;
-  roles: Array<String>;
+  rolesPropos: Array<string>;
 }) => {
   let location = useLocation();
-  const { isAuthenticated, user, loading } = useSelector((state: RootState) => state.auth);
- 
-  if (loading) {
-    return <p className="container">Checking auth..</p>;
+
+  const roles =  JSON.parse(localStorage.getItem("roles") || "");
+  const isAuthenticated = localStorage.getItem("isAuthenticated");
+
+  if(roles){
+      let rolePermitted = false;
+      roles.forEach((role: string) => {
+        return rolePermitted = rolesPropos.includes(role);
+      });
+
+      const isPermitted = isAuthenticated && rolePermitted ? true : false;
+
+      if (!isAuthenticated || !isPermitted) {
+        console.log("User has required role");
+        return <AccessDenied />;
+      }
+
+      if (!isAuthenticated) {
+        return <Navigate to="/login" state={{ from: location }} />;
+      }
   }
- 
-  const userHasRequiredRole = user && roles.includes(user.role) ? true : false;
- 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} />;
-  }
- 
-  if (isAuthenticated && !userHasRequiredRole) {
-    console.log("User has required role", user);
-   // return <AccessDenied />; // build your won access denied page (sth like 404)
-  }
- 
-  return children;
+
+  return <>{children}</>;
 };
