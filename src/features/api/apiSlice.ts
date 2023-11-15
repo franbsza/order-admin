@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react"
 
-const baseUrl = "http://localhost:8080/api";
+const baseUrl = "http://localhost:8090/api";
 
 export const apiSlice = createApi({
     reducerPath: "api",
@@ -12,6 +12,7 @@ export const apiSlice = createApi({
             headers.set('Content-Type', 'application/json');
             headers.set('Accept', 'application/json');
             headers.set('Access-Control-Allow-Origin', '*');
+            headers.set('Authorization', "Bearer " + JSON.parse(localStorage.getItem('token') || ''));
             return headers
         }
     })

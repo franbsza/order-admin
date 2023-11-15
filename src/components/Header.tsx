@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
+import keycloak from '../config/keycloak';
 
 export default function Header() {
   return (
@@ -24,7 +25,7 @@ export default function Header() {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Home
           </Typography>
-          <Button color="inherit">Login</Button>
+          <Button color="inherit" onClick={() => keycloak.logout()}>Logout</Button>
         </Toolbar>
       </AppBar>
     </Box>

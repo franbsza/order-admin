@@ -1,10 +1,11 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import keycloak from "../config/keycloak"
+import keycloak from "../config/keycloak";
 
 import {
     setAuthenticated,
     setIsLoading,
+    setRoles,
     setToken,
     setUserDetails,
   } from "../features/auth/SliceAuth";
@@ -15,12 +16,13 @@ import {
     children: React.ReactNode;
   }) => {
     const dispatch = useDispatch();
-  
+
     useEffect(() => {
       const updateToken = (refresh = false) => {
         if (refresh) {
             keycloak.updateToken(70).then((refreshed) => {
             if (refreshed) {
+              localStorage.setItem("token", JSON.stringify(keycloak.token));
               dispatch(setToken(keycloak.token));
             }
           });
@@ -28,6 +30,7 @@ import {
       };
   
       keycloak.onTokenExpired = () => {
+        localStorage.removeItem("token");
         updateToken(true);
       };
   
@@ -39,6 +42,14 @@ import {
             dispatch(setToken(keycloak.token));
             const userInfo = await keycloak.loadUserInfo();
             dispatch(setUserDetails(userInfo));
+            var roles = keycloak.realmAccess?.roles;
+            dispatch(setRoles(roles));
+
+            localStorage.setItem("user", JSON.stringify(userInfo));
+            localStorage.setItem("token", JSON.stringify(keycloak.token));
+            localStorage.setItem("isAuthenticated", JSON.stringify(true));
+            localStorage.setItem("roles", JSON.stringify(roles));
+
           } else {
             dispatch(setAuthenticated(false));
           }
