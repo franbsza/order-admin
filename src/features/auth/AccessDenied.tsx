@@ -5,7 +5,7 @@ export const AccessDenied = () => {
   return (
     <div className="access-denied">
       <div className="container">
-            <Link to={`/`}>
+            <Link to={`/orders`}>
               <Button>Back to Dashboard</Button>
             </Link>
       </div>

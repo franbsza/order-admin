@@ -11,6 +11,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { CreateOrder } from './features/orders/CreateOrder';
 import { ListOrders } from './features/orders/ListOrders';
 import { ProtectedRoutes } from './components/ProtectedRoutes';
+import { ListOrdersByUser } from './features/orders/ListOrderByUser';
 
 function App(){
 
@@ -36,10 +37,10 @@ function App(){
       <Layout>
         <Routes>
           <Route 
-            path="/" 
+            path="/home" 
             element={
             <ProtectedRoutes 
-              rolesPropos={["USER"]}> 
+              rolesPropos={["STAFF"]}> 
               <ListOrders /> 
             </ProtectedRoutes>
           }/>
@@ -49,7 +50,7 @@ function App(){
             element={
             <ProtectedRoutes 
               rolesPropos={["USER"]}>
-              <ListOrders />
+              <ListOrdersByUser />
             </ProtectedRoutes>
           }/>
 

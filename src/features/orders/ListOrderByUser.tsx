@@ -1,25 +1,28 @@
 import { Box, Button, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { useGetOrdersQuery } from '../orders/SliceOrder';
-
 import { GridFilterModel } from '@mui/x-data-grid';
 import { OrderTable } from './components/OrderTable';
 import { useState } from 'react';
 
-export const ListOrders = () => {
+export const ListOrdersByUser = () => {
 
 const [page, setPage] = useState(0);
-const [perPage, setPerPage] = useState(10);
-const [search] = useState(""); 
-const [rowsPerPage] = useState([10, 25, 50, 100])
+const [perPage, setPerPage] = useState(5);
+const [rowsPerPage] = useState([5, 10, 50])
 
 const [options, setOptions] = useState({
   page: page,
   perPage: perPage,
-  rowsPerPage: rowsPerPage
+  rowsPerPage: rowsPerPage,
 });
 
-const { data, error , isFetching} = useGetOrdersQuery({ page: page, perPage: perPage});
+const user = JSON.parse(localStorage.getItem("user") || "");
+const { data, error , isFetching} = useGetOrdersQuery({ 
+    page: page, 
+    perPage: perPage, 
+    email: user.email 
+});
 
 function handleOnPageChange(page: number) {
   setPage(page+1);
@@ -32,12 +35,9 @@ function handleOnPageSizeChange(perPage: number) {
 }
 
 function handleFilterChange(filterModel: GridFilterModel) {
-  if (!filterModel.quickFilterValues?.length) {
-    return setOptions({ ...options });
-  }
-
-  const search = filterModel.quickFilterValues.join("");
-  setOptions({ ...options });
+    if (!filterModel.quickFilterValues?.length) {
+        return setOptions({ ...options});
+      }
 }
 
 if (error) {

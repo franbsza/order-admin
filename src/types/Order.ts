@@ -36,6 +36,7 @@ export interface OrderDto {
 }
 
 export interface OrderRequest {
+  id: string;
   serviceId: number;
   addressId: number;
   vehicleId: number;
@@ -82,6 +83,5 @@ export interface OrderRequest {
   export interface OrderParams {
     page?: number;
     perPage?: number;
-    search?: String;
-    orderStatus?: String;
+    email?: String;
   }
