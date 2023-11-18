@@ -15,10 +15,13 @@ export const ProtectedRoutes = ({
   const isAuthenticated = localStorage.getItem("isAuthenticated");
 
   if(roles){
-      let rolePermitted = false;
-      roles.forEach((role: string) => {
-        return rolePermitted = rolesPropos.includes(role);
-      });
+    let rolePermitted = false;
+      for (var role of rolesPropos) {
+         if(roles.includes(role)) {
+          rolePermitted = true;
+          break;
+         }
+      }
 
       const isPermitted = isAuthenticated && rolePermitted ? true : false;
 
