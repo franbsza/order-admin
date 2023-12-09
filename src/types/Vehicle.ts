@@ -1,7 +1,14 @@
 export interface Vehicle{
-    id: number;
-    name: string;
-    isActive: boolean;
+  id: number;
+  name: String;
+  isActive: boolean;
+  brand: string;
+  model: string;
+  year: string;
+  plateNumber: string;
+  color: string;
+  renavam: string;
+  isProtected: boolean;
   }
 
   export interface VehicleResponse {

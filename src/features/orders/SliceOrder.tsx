@@ -1,9 +1,9 @@
 import { apiSlice } from '../api/apiSlice';
-import { Order, OrderParams, OrderRequest, OrderResponse } from '../../types/Order';
+import { OrderDto, OrderParams, OrderResponse } from '../../types/Order';
 
 const endpointUrl = "/orders";
 
-function createOrderMutation(orderRequest: OrderRequest) {
+function createOrderMutation(orderRequest: OrderDto) {
     return { 
         url: endpointUrl, 
         method: "POST", 
@@ -35,11 +35,7 @@ function getOrderById({ id }: { id: string}) {
     return `${endpointUrl}/${id}`;
 }
 
-function getOrderByUser({email} : { email: string }) {
-    return `${endpointUrl}/email/${email}`;
-}
-
-function updateOrderMutation(order: OrderRequest) {
+function updateOrderMutation(order: OrderDto) {
     return {
       url: `${endpointUrl}/${order.id}`,
       method: "PUT",
@@ -47,27 +43,34 @@ function updateOrderMutation(order: OrderRequest) {
     };
   }
 
+  function cancelOrderMutation({ id }: { id: string}) {
+    return {
+      url: `${endpointUrl}/${id}`,
+      method: "DELETE",
+    };
+}
+
 export const ordersApiSlice = apiSlice.injectEndpoints({
     endpoints: ({query, mutation}) => ({
-        createOrder: mutation<OrderResponse, OrderRequest>({
+        createOrder: mutation<OrderResponse, OrderDto>({
             query: createOrderMutation,
             invalidatesTags: ["Orders"]
         }),
-        getOrderById: query<OrderRequest, {id: string}>({
+        getOrderById: query<OrderDto, {id: string}>({
             query: getOrderById,
-            providesTags: ["Orders"]
-        }),
-        getOrderByUser: query<OrderResponse, {email: string}>({
-            query: getOrderByUser,
             providesTags: ["Orders"]
         }),
         getOrders: query<OrderResponse, OrderParams>({
             query: getOrders,
             providesTags: ["Orders"]
         }),
-        updateOrder: mutation<Order, OrderRequest>({
+        updateOrder: mutation<OrderResponse, OrderDto>({
             query: updateOrderMutation,
             invalidatesTags: ["Orders"],
+        }),
+        cancelOrder: mutation<OrderResponse, {id: String}>({
+            query: cancelOrderMutation,
+            invalidatesTags: ["Orders"]
         }),
     })
 }); 
@@ -77,5 +80,5 @@ export const {
     useGetOrdersQuery,
     useGetOrderByIdQuery,
     useUpdateOrderMutation,
-    useGetOrderByUserQuery,
+    useCancelOrderMutation
 } = ordersApiSlice

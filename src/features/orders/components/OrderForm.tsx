@@ -2,21 +2,23 @@ import {
     Box,
     Button,
     FormControl,
-    FormHelperText,
     Grid,
+    InputLabel,
     MenuItem,
     Select,
     SelectChangeEvent,
-    TextField
+    TextField,
+    Typography
   } from '@mui/material';
   import { Link } from 'react-router-dom';
-  import { OrderRequest } from '../../../types/Order';
-  import { Vehicle, VehicleResponse } from '../../../types/Vehicle';
+  import { OrderDto } from '../../../types/Order';
+  import { VehicleResponse } from '../../../types/Vehicle';
   import { DatePicker } from '@mui/x-date-pickers';
 import { InputError } from '../../../types/InputError';
+import dayjs from 'dayjs';
   
   type Props = {
-      order: OrderRequest;
+      order: OrderDto;
       vehicleResponse: VehicleResponse | undefined;
       isDisabled?: boolean;
       isLoading?: boolean;
@@ -24,8 +26,7 @@ import { InputError } from '../../../types/InputError';
       hadleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
       hadleSelectChange: (e: SelectChangeEvent<String>) => void;
       hadleSelectChangeNumber: (e: SelectChangeEvent<Number>) => void;
-      handleDateChange : (value: Date | null) => void;
-      vehicleId: Number;
+      handleDateChange : (value: string | null ) => void;
       inputError: InputError;
     }
   
@@ -39,7 +40,6 @@ import { InputError } from '../../../types/InputError';
       hadleSelectChange,
       hadleSelectChangeNumber,
       handleDateChange,
-      vehicleId,
       inputError
   }: Props) {
 
@@ -53,66 +53,79 @@ import { InputError } from '../../../types/InputError';
       }
 
       const vehicleList = vehicleResponse ? mapDataToGridRows(vehicleResponse) : [];
+      console.log(dayjs(order.dateTime).format("DD/MM/YYYY"));
 
+      if(isLoading) {
+        return <Typography>Carregando...</Typography>
+      }
+  
       return (
         
           <Box>
             <form onSubmit={handleSubmit}>
 
-            <Grid 
-            container spacing={2} item xs={12} 
-            columns={{ xs: 6, sm: 6, md: 12 }}  
-            justifyContent="center" 
-            alignItems="center" 
-            direction="column">
-                <Grid item xs={12}>
-                <FormControl sx={{ m: 1, width: 300 }}>
+            <Grid container spacing={2} sx={{p: 2}}>
+                
+                <Grid item xs={12} sm={6} md={4}>
+                  <FormControl fullWidth >
+                  <InputLabel id="veiculo">veículo</InputLabel>
                   <Select
-                    labelId="vehicleId"
-                    id='vehicleId'
+                    label="veiculo"
+                    id="veiculo"
+                    disabled={isDisabled} 
                     name="vehicleId"
-                    value={vehicleId} 
+                    displayEmpty
+                    value={order.vehicle.id} 
                     onChange={hadleSelectChangeNumber}
                     error={inputError.vehicleIdError}
                     >
                     <MenuItem key={0} value={0} selected={true}>
-                      {vehicleList.length === 0 ? "Sem veículo cadastrado" : "Selecione"}
+                      {vehicleList.length === 0 ? "Sem veículo cadastrado" : "selecione um veículo"}
                     </MenuItem>
                     {
-                    vehicleList.map(vehicle => {
+                    vehicleList.map(v => {
                         return (
-                            <MenuItem key={vehicle.id} value={vehicle.id}> 
-                            <em> {vehicle.name}</em>
+                            <MenuItem key={v.id} value={v.id}> 
+                            <em> {v.name}</em>
                             </MenuItem>
                         );
                     })};
                   </Select>
-                  <FormHelperText>Selecione o veículo</FormHelperText>
                   </FormControl>
                 </Grid>
 
-                <Grid item xs={12}>
-                  <FormControl sx={{ m: 1, width: 300 }}>
+                <Grid item xs={12} sm={6} md={4}>
+                  <FormControl fullWidth>
                     <DatePicker 
+                    label="data atendimento"
+                    disabled={isDisabled} 
                     disablePast={true}
+                    format='DD/MM/YYYY'
+                    slotProps={{
+                      textField: {
+                        error: inputError.dateTimeError,
+                        name: 'dateTime'
+                      }
+                    }}
+                    value={dayjs(order.dateTime).format("DD/MM/YYYY") || ""}
                     onChange={handleDateChange}
                     />
-                    <FormHelperText>Selecione a data</FormHelperText>
                   </FormControl>
                 </Grid>
 
-                <Grid item xs={12}>
-                    <FormControl sx={{ m: 1, width: 300 }}>
+                <Grid item xs={12} sm={6} md={4}>
+                    <FormControl fullWidth>
+                    <InputLabel id="periodo">período</InputLabel>
                     <Select
-                    labelId="period"
-                    id="period"
-                    name="period"
+                    label="periodo"
+                    id="periodo"
+                    disabled={isDisabled} 
                     displayEmpty
-                    value={order.period} 
+                    name="period"
+                    value={order.period || ""} 
                     onChange={hadleSelectChange} 
                     error={inputError.periodError}
                     >
-                    <MenuItem key="0" value="" selected={true}>Selecione</MenuItem>
                     <MenuItem key="1" value="MORNING" selected={true}>
                       <em>Manhã</em>
                     </MenuItem>      
@@ -120,30 +133,100 @@ import { InputError } from '../../../types/InputError';
                       <em>Tarde</em>
                     </MenuItem>              
                   </Select>
-                  <FormHelperText>Selecione o período</FormHelperText>
                   </FormControl>
                 </Grid>
-            
+ 
+                <Grid item xs={12} sm={6} md={4}>
+                  <FormControl fullWidth>
+                      <TextField 
+                      label="endereço" 
+                      name="street"
+                      value={order.address.street || ""}
+                      disabled={isDisabled} 
+                      onChange={hadleChange}
+                      />
+                    </FormControl>
+                </Grid>
 
-            <Grid item xs={12}>
-                  <FormControl sx={{ m: 2, width: 300 }}>
+                <Grid item xs={12} sm={6} md={4}>
+                  <FormControl fullWidth>
+                      <TextField 
+                      label="número" 
+                      name="number"
+                      value={order.address.number || ""}
+                      disabled={isDisabled} 
+                      onChange={hadleChange}
+                      />
+                    </FormControl>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={4}>
+                  <FormControl fullWidth>
+                      <TextField 
+                      label="bairro" 
+                      name="neighborhood"
+                      value={order.address.neighborhood || ""}
+                      disabled={isDisabled} 
+                      onChange={hadleChange}
+                      />
+                    </FormControl>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={4}>
+                  <FormControl fullWidth>
+                      <TextField 
+                      label="cidade"
+                      name="city" 
+                      value={order.address.city || ""}
+                      disabled={isDisabled} 
+                      onChange={hadleChange}
+                      />
+                    </FormControl>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={4}>
+                  <FormControl fullWidth>
+                      <TextField 
+                      label="estado" 
+                      name="state"
+                      value={order.address.state || ""}
+                      disabled={isDisabled} 
+                      onChange={hadleChange}
+                      />
+                    </FormControl>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={4}>
+                  <FormControl fullWidth >
+                      <TextField 
+                      label="CEP" 
+                      name="zipCode"
+                      value={order.address.zipCode || ""}
+                      disabled={isDisabled} 
+                      onChange={hadleChange}
+                      />
+                    </FormControl>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={12}>
+                  <FormControl fullWidth>
                     <TextField 
-                    name="description" 
-                    value={order.description}
+                    label="descrição"
+                    name="description"
+                    value={order.description || ""}
                     disabled={isDisabled} 
                     onChange={hadleChange}
                     />
-                     <FormHelperText>Descrição</FormHelperText>
                     </FormControl>
-            </Grid>
+                </Grid>
   
-            <Grid item xs={12} sx={{ m: 2, marginTop: 0}}>
-                <Box display="flex" gap={2}>
+                <Grid item xs={12} sm={12} sx={{ m: 2, marginTop: 0}}>
+                  <Box display="flex" gap={2} justifyContent="center">
                     <Button 
                     component={Link} 
                     to="/orders"
                     variant="contained" 
-                    color="success"
+                    color="primary"
                     disabled={isDisabled}
                     >
                     Back
@@ -152,16 +235,16 @@ import { InputError } from '../../../types/InputError';
                     <Button 
                     type="submit" 
                     variant="contained" 
-                    color="secondary"
+                    color="success"
                     disabled={isDisabled}
                     >
                     {isLoading ? "Loading..." : "Save"}
                     </Button>
-                </Box>
-            </Grid>
+                  </Box>
+                </Grid>
 
             </Grid>
-        </form>
+          </form>
         </Box>
       );
   }

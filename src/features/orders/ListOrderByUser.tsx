@@ -1,9 +1,10 @@
 import { Box, Button, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { useGetOrdersQuery } from '../orders/SliceOrder';
+import { useCancelOrderMutation, useGetOrdersQuery } from '../orders/SliceOrder';
 import { GridFilterModel } from '@mui/x-data-grid';
 import { OrderTable } from './components/OrderTable';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { enqueueSnackbar } from 'notistack';
 
 export const ListOrdersByUser = () => {
 
@@ -24,6 +25,9 @@ const { data, error , isFetching} = useGetOrdersQuery({
     email: user.email 
 });
 
+const [cancelOrder, { error: deleteError, isSuccess: deleteSuccess }] =
+useCancelOrderMutation();
+
 function handleOnPageChange(page: number) {
   setPage(page+1);
   setOptions({ ...options, page: page});
@@ -39,6 +43,20 @@ function handleFilterChange(filterModel: GridFilterModel) {
         return setOptions({ ...options});
       }
 }
+
+async function handleCancelOrder(id: string) {
+  await cancelOrder({ id });
+}
+
+useEffect(() => {
+  if (deleteSuccess) {
+    enqueueSnackbar(`Order cancelled`, { variant: "success" });
+  }
+  if (deleteError) {
+    enqueueSnackbar(`Order not cancelled`, { variant: "error" });
+  }
+}, [deleteSuccess, deleteError]);
+
 
 if (error) {
   return <Typography>Error fetching categories</Typography>;
@@ -67,6 +85,7 @@ if (error) {
         handleOnPageChange={handleOnPageChange}
         handleOnPageSizeChange={handleOnPageSizeChange}
         handleFilterChange={handleFilterChange}
+        handleDelete={handleCancelOrder}
       />
       </Box>
     );
