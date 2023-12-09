@@ -2,27 +2,48 @@ import { Box, Typography, Paper, SelectChangeEvent } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useCreateOrderMutation } from '../orders/SliceOrder';
 import { useGetVehiclesQuery } from '../vehicle/SliceVehicle';
-import { OrderRequest} from '../../types/Order';
+import { OrderDto } from '../../types/Order';
 import { useSnackbar } from 'notistack';
 import { OrderForm } from './components/OrderForm';
 import { InputError } from '../../types/InputError';
 
 export const CreateOrder = () => {
 
-  const [vehicleId, setVehicleId] = useState<Number>(0);
   const { enqueueSnackbar } = useSnackbar();
   const [createOrder, status] = useCreateOrderMutation();
-  const { data, error , isFetching} = useGetVehiclesQuery();
+  const { data: vehicles , error , isFetching} = useGetVehiclesQuery();
   const [isDisabled, setIsDisabled] = useState(false);
   const [isLoading] = useState(false);
-  const [orderState, setOrderState] = useState<OrderRequest>({
-    serviceId: 1,
-    addressId: 1,
-    vehicleId: 0,
-    orderStatus: "OPEN",
-    period: "", 
-    dateTime: new Date(),
-    description: ""
+  const [orderState, setOrderState] = useState<OrderDto>({
+        id: 0,
+        serviceId: 1,
+        serviceName: "",
+        address: {
+          id: 0,
+          street: "",
+          number: "",
+          neighborhood: "",
+          city: "",
+          state: "",
+          zipCode: ""
+        },
+        vehicle: {
+          id: 0,
+          name: "",
+          isActive: false,
+          brand: "",
+          model: "",
+          year: "",
+          plateNumber: "",
+          color: "",
+          renavam: "",
+          isProtected: false
+        },
+        orderStatus: "OPEN",
+        period: "", 
+        dateTime: new Date(),
+        description: "",
+        expertTechnicianName: ""
   });
 
   const [inputError, setInputError] = useState<InputError>({
@@ -33,8 +54,15 @@ export const CreateOrder = () => {
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setOrderState({ ...orderState, [name]: value });
-  };
+    if(name === "description"){
+      setOrderState({ ...orderState, [name]: value });
+    }
+    else{
+      setOrderState({ 
+        ...orderState, 
+        address: {...orderState.address, [name]: value }
+      });
+    }}
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>){
     e.preventDefault();
@@ -46,10 +74,7 @@ export const CreateOrder = () => {
     });
     var isValid = true;
 
-    console.log(orderState.vehicleId)
-
-    if(orderState.vehicleId === 0){
-      
+    if(orderState.vehicle.id === 0){
       setInputError({...inputError, vehicleIdError: true})
       isValid = false;
     }
@@ -68,41 +93,36 @@ export const CreateOrder = () => {
 
   const hadleSelectChange = (e: SelectChangeEvent<String>) => {
     const { name, value } = e.target;
-
-    setInputError({...inputError, 
-      periodError: false, 
+    setInputError({...inputError, periodError: false, 
     });
     if(value === ""){
       setInputError({...inputError, periodError: true})
-      console.log(inputError.periodError);
     }
     else{
       setInputError({...inputError, periodError: false})
-      console.log(inputError.periodError);
     }
     setOrderState({ ...orderState, [name]: value });
-  };
+ };
 
-  const hadleSelectChangeNumber = (e: SelectChangeEvent<Number>) => {
-    const { name, value } = e.target;
-
-    setInputError({...inputError, 
-      vehicleIdError:false
+ const hadleSelectChangeNumber = (e: SelectChangeEvent<Number>) => {
+  const { name, value } = e.target;
+  setInputError({...inputError, vehicleIdError:false
+  });
+  if(value === 0){
+    setInputError({...inputError, vehicleIdError: true})
+  }
+  else{
+    setInputError({...inputError, vehicleIdError: false})
+    const vehicleChange = vehicles?.data.find(v => v.id === value);
+    setOrderState({ 
+      ...orderState, 
+      vehicle: vehicleChange as OrderDto['vehicle']
     });
-    if(value === 0){
-      setInputError({...inputError, vehicleIdError: true})
-      console.log(inputError.vehicleIdError);
-    }
-    else{
-      setInputError({...inputError, vehicleIdError: false})
-      console.log(inputError.vehicleIdError);
-    }
-    setOrderState({ ...orderState, [name]: value });
-    setVehicleId(value as number);
-  };
+  }
+};
 
-  const handleDateChange = (value: Date | null) => {
-    const data =  value || new Date();
+  const handleDateChange = (value: string | null) => {
+    const data = value === null ? new Date() : new Date(value);
     setOrderState({ ...orderState, dateTime: data });
   };
 
@@ -116,6 +136,9 @@ export const CreateOrder = () => {
     }
   }, [enqueueSnackbar, status.isSuccess, status.error]);
 
+    if(isFetching){
+      return <div>Loading...</div>
+    }
     return (
 
       <Box>
@@ -131,15 +154,14 @@ export const CreateOrder = () => {
 
           <OrderForm
           order={orderState}
-          vehicleResponse={data}
+          vehicleResponse={vehicles}
           isDisabled={isLoading}
-          isLoading={isLoading}
+          isLoading={isFetching}
           handleSubmit={handleSubmit}
           hadleChange={handleChange}
           hadleSelectChange={hadleSelectChange}
           hadleSelectChangeNumber={hadleSelectChangeNumber}
           handleDateChange={handleDateChange}
-          vehicleId={vehicleId}
           inputError={inputError}
           />
         </Paper>

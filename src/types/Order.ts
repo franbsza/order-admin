@@ -18,16 +18,10 @@ export interface Order {
 
 export interface OrderDto {
   id: number;
+  serviceId: number;
   serviceName: String;
-  addressId: number
-  neighborhood: String;
-  street: String;
-  number: String;
-  city: String;
-  state: String;
-  zipCode: String;
-  vehicleId: number;
-  vehicleName: String;
+  address: Address;
+  vehicle: Vehicle;
   orderStatus: null | String;
   period: String;
   dateTime: Date;
@@ -38,8 +32,8 @@ export interface OrderDto {
 export interface OrderRequest {
   id: string;
   serviceId: number;
-  addressId: number;
-  vehicleId: number;
+  address: Address
+  vehicle: Vehicle;
   orderStatus: null | String;
   period: String;
   dateTime: Date;
@@ -68,11 +62,25 @@ export interface OrderRequest {
 
   export interface Address {
     id: number;
+    street: string;
+    number: string;
+    neighborhood: string;
+    city: string;
+    state: string;
+    zipCode: string;
   }
 
   export interface Vehicle {
     id: number;
     name: String;
+    isActive: boolean;
+    brand: string;
+    model: string;
+    year: string;
+    plateNumber: string;
+    color: string;
+    renavam: string;
+    isProtected: boolean;
   }
   
   export interface Slot {

@@ -8,6 +8,8 @@ import {
   } from '@mui/x-data-grid';
 import { Box,IconButton, Typography } from '@mui/material';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
+import BlockIcon from '@mui/icons-material/Block';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Link } from 'react-router-dom';
 
 type Props = {
@@ -15,10 +17,10 @@ type Props = {
     perPage: number;
     isFetching: boolean;
     rowsPerPage?: number[];
-
     handleOnPageChange: (page:number) => void;
     handleFilterChange: (filterModel: GridFilterModel) => void;
     handleOnPageSizeChange: (perPage: number) => void;
+    handleDelete: (id: string) => void;
   }
 
 export function OrderTable({
@@ -28,9 +30,8 @@ export function OrderTable({
     rowsPerPage,
     handleOnPageChange,
     handleFilterChange,
-    handleOnPageSizeChange,
-
-    
+    handleOnPageSizeChange, 
+    handleDelete 
 }: Props){
 
     const componentProps={
@@ -66,15 +67,27 @@ export function OrderTable({
           field: "orderStatus", 
           headerName: "Status", 
           flex: 1,
-          type: "string",
-          renderCell: renderStatusCell
+          type: "string"
+        },
+        { 
+          field: "detailsAction", 
+          headerName: "Details", 
+          flex: 0.5 ,
+          renderCell: renderDetailsActionCell
         },
         { 
           field: "editAction", 
           headerName: "Edit", 
-          flex: 1 ,
+          flex: 0.5 ,
           renderCell: renderEditActionCell
-        }
+        },
+        { 
+          field: "cancelAction", 
+          headerName: "Cancel", 
+          type: "string",
+          flex: 0.5 ,
+          renderCell: renderCancelActionCell
+        },
       ];
 
       function mapDataToGridRows(data: OrderResponse) {
@@ -85,8 +98,21 @@ export function OrderTable({
           orderStatus: order.orderStatus,
           period: order.period,
           dateTime: new Date(order.dateTime).toLocaleDateString("pt-BR"),
-          vehicleName: order.vehicleName
+          vehicleName: order.vehicle.name,
         }));
+      }
+
+      function renderDetailsActionCell(rowData: GridRenderCellParams) {
+        return (
+
+        <Link to={`/orders/details/${rowData.id}`} 
+        style={{ textDecoration: "none" }}
+        >
+            <IconButton>
+              <VisibilityIcon color='info'/>
+            </IconButton>
+            </Link>
+        )
       }
       
       function renderEditActionCell(rowData: GridRenderCellParams) {
@@ -100,6 +126,17 @@ export function OrderTable({
             </Link>
         )
       }
+
+      function renderCancelActionCell(rowData: GridRenderCellParams) {
+        return (
+          <IconButton
+          color="secondary"
+          onClick={() => handleDelete(rowData.row.id)}
+          aria-label="delete">
+            <BlockIcon />
+          </IconButton>
+        )
+      }
       
       function renderPeriodCell(rowData: GridRenderCellParams) {
         var periodTranslated = null;
@@ -109,38 +146,9 @@ export function OrderTable({
         else{
           periodTranslated = "Tarde";
         }
-
         return (
           <Typography>
             {periodTranslated}
-          </Typography>
-        )
-      }
-
-      function renderStatusCell(rowData: GridRenderCellParams) {
-        var statusTranslated = null;
-        switch(rowData.value) {
-          case "OPEN":
-            statusTranslated = "Em aberto";
-            break;
-          case "IN_PROGRESS":
-            statusTranslated = "Em andamento";
-            break;
-          case "PENDING":
-            statusTranslated = "Pendente";
-            break;
-          case "CANCELED":
-            statusTranslated = "Cancelado";
-            break;
-          case "COMPLETED_SUCCESS":
-            statusTranslated = "Concluído";
-            break;
-          default:
-            statusTranslated = "Indefinido";
-        }
-        return (
-          <Typography>
-            {statusTranslated}
           </Typography>
         )
       }

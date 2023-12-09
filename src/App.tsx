@@ -12,6 +12,8 @@ import { CreateOrder } from './features/orders/CreateOrder';
 import { ListOrders } from './features/orders/ListOrders';
 import { ProtectedRoutes } from './components/ProtectedRoutes';
 import { ListOrdersByUser } from './features/orders/ListOrderByUser';
+import { EditOrder } from './features/orders/EditOrder';
+import { Details } from './features/orders/Details';
 
 function App(){
 
@@ -62,6 +64,25 @@ function App(){
               <CreateOrder />
             </ProtectedRoutes>
           }/>
+
+          <Route 
+            path="/orders/edit/:id" 
+            element={
+            <ProtectedRoutes 
+              rolesPropos={["USER"]}>
+              <EditOrder />
+            </ProtectedRoutes>
+          }/>
+
+          <Route 
+            path="/orders/details/:id" 
+            element={
+            <ProtectedRoutes 
+              rolesPropos={["USER"]}>
+              <Details />
+            </ProtectedRoutes>
+          }/>
+
 
           <Route 
             path='*' 
