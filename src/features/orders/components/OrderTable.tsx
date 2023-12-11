@@ -158,7 +158,7 @@ export function OrderTable({
 
       return (
         <Box sx={{ display: 'flex', height: 500, width: '100%' }}>
-            <DataGrid 
+            <DataGrid
             rows={rows}
             pagination={true}
             columns={columns}

@@ -14,3 +14,23 @@ export const appTheme = createTheme({
         text: { primary : "#fff" }
     },
 });
+
+export const darkTheme = createTheme({
+    palette: {
+      background: { default: "#222222" },
+      mode: "dark",
+      primary: { main: "#cd43e8" },
+      secondary: { main: "#E50914" },
+      text: { primary: "#f5f5f1" },
+    },
+  });
+  
+  export const lightTheme = createTheme({
+    palette: {
+      background: {},
+      mode: "light",
+      primary: { main: "#5a056b" },
+      secondary: { main: "#222222" },
+      text: { primary: "#222222" },
+    },
+  });
