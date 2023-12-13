@@ -15,7 +15,7 @@ import {
   import { VehicleResponse } from '../../../types/Vehicle';
   import { DatePicker } from '@mui/x-date-pickers';
 import { InputError } from '../../../types/InputError';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
   
   type Props = {
       order: OrderDto;
@@ -53,7 +53,6 @@ import dayjs from 'dayjs';
       }
 
       const vehicleList = vehicleResponse ? mapDataToGridRows(vehicleResponse) : [];
-      console.log(dayjs(order.dateTime).format("DD/MM/YYYY"));
 
       if(isLoading) {
         return <Typography>Carregando...</Typography>
@@ -107,7 +106,6 @@ import dayjs from 'dayjs';
                         name: 'dateTime'
                       }
                     }}
-                    value={dayjs(order.dateTime).format("DD/MM/YYYY") || ""}
                     onChange={handleDateChange}
                     />
                   </FormControl>
