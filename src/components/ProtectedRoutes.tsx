@@ -10,9 +10,8 @@ export const ProtectedRoutes = ({
   rolesPropos: Array<string>;
 }) => {
   let location = useLocation();
-
-  const roles =  JSON.parse(localStorage.getItem("roles") || "");
-  const isAuthenticated = localStorage.getItem("isAuthenticated");
+  let isAuthenticated = localStorage.getItem("isAuthenticated") ? JSON.parse(localStorage.getItem("isAuthenticated") || "") : false;
+  let roles = localStorage.getItem("roles") ? JSON.parse(localStorage.getItem("roles") || "") : [];
 
   if(roles){
     let rolePermitted = false;

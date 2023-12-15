@@ -25,3 +25,23 @@ export interface Vehicle{
     last_page: number;
     current_page: number;
   }
+
+  export interface VehicleParams {
+    page?: number;
+    perPage?: number;
+    email?: String;
+  }
+
+  export interface VehicleDto{
+    id: number;
+    name: String;
+    isActive: boolean;
+    brand: string;
+    model: string;
+    year: string;
+    plateNumber: string;
+    color: string;
+    renavam: string;
+    isProtected: boolean;
+    email: string;
+    }

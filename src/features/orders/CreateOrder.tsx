@@ -11,7 +11,12 @@ export const CreateOrder = () => {
 
   const { enqueueSnackbar } = useSnackbar();
   const [createOrder, status] = useCreateOrderMutation();
-  const { data: vehicles , error , isFetching} = useGetVehiclesQuery();
+  const { data: vehicles , error , isFetching} = useGetVehiclesQuery(
+    { 
+      page: 0, 
+      perPage: 10
+    }
+  );
   const [isDisabled, setIsDisabled] = useState(false);
   const [isLoading] = useState(false);
   const [orderState, setOrderState] = useState<OrderDto>({
@@ -128,11 +133,11 @@ export const CreateOrder = () => {
 
   useEffect(() => {
     if(status.isSuccess){
-      enqueueSnackbar("Order created successfully", { variant: "success" });
+      enqueueSnackbar("Ordem de serviço criada", { variant: "success" });
       setIsDisabled(true);
     }
     if(status.error){
-      enqueueSnackbar("Order not created", { variant: "error" });
+      enqueueSnackbar("Ocorreu um erro ao criar a ordem de serviço", { variant: "error" });
     }
   }, [enqueueSnackbar, status.isSuccess, status.error]);
 

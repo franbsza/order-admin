@@ -1,13 +1,14 @@
 import { Box, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { useCancelOrderMutation, useGetOrdersQuery } from '../orders/SliceOrder';
 import { GridFilterModel } from '@mui/x-data-grid';
-import { OrderTable } from './components/OrderTable';
+import { VehicleTable } from './components/VehicleTable';
 import { useEffect, useState } from 'react';
 import { enqueueSnackbar } from 'notistack';
+import { useGetVehiclesQuery } from './SliceVehicle';
+import { useCancelOrderMutation } from '../orders/SliceOrder';
 import { Empty } from '../../components/Empty';
 
-export const ListOrdersByUser = () => {
+export const ListVehicles = () => {
 
 const [page, setPage] = useState(0);
 const [perPage, setPerPage] = useState(5);
@@ -19,14 +20,9 @@ const [options, setOptions] = useState({
   rowsPerPage: rowsPerPage,
 });
 
-const user = JSON.parse(localStorage.getItem("user") || "");
-const { data, error , isFetching} = useGetOrdersQuery({ 
-    page: page, 
-    perPage: perPage, 
-    email: user.email 
-});
+const { data, error , isFetching} = useGetVehiclesQuery({ page: page, perPage: perPage});
 
-const [cancelOrder, { error: deleteError, isSuccess: deleteSuccess }] =
+const [cancelRegister, { error: deleteError, isSuccess: deleteSuccess }] =
 useCancelOrderMutation();
 
 function handleOnPageChange(page: number) {
@@ -45,16 +41,16 @@ function handleFilterChange(filterModel: GridFilterModel) {
       }
 }
 
-async function handleCancelOrder(id: string) {
-  await cancelOrder({ id });
+async function handleVehicleDelete(id: string) {
+  await cancelRegister({ id });
 }
 
 useEffect(() => {
   if (deleteSuccess) {
-    enqueueSnackbar(`Ordem de serviço cancelada`, { variant: "success" });
+    enqueueSnackbar(`Veículo excluido`, { variant: "success" });
   }
   if (deleteError) {
-    enqueueSnackbar(`Ordem de serviço não pode ser cancelada`, { variant: "error" });
+    enqueueSnackbar(`Veiculo não excluido`, { variant: "error" });
   }
 }, [deleteSuccess, deleteError]);
 
@@ -71,14 +67,14 @@ if (error) {
               variant="contained"
               component={Link}
               color="primary"
-              to="/orders/create"
+              to="/vehicles/create"
               style={{ marginBottom: "1rem" }}
               >
-            Nova ordem de serviço
+            Cadastrar veículo
           </Button>
         </Box>
 
-        <OrderTable
+        <VehicleTable
         data={data}
         isFetching={isFetching}
         perPage={options.perPage}
@@ -86,7 +82,7 @@ if (error) {
         handleOnPageChange={handleOnPageChange}
         handleOnPageSizeChange={handleOnPageSizeChange}
         handleFilterChange={handleFilterChange}
-        handleDelete={handleCancelOrder}
+        handleDelete={handleVehicleDelete}
       />
       </Box>
     );

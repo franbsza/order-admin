@@ -13,7 +13,12 @@ import { InputError } from '../../types/InputError';
     const id = useParams().id as string;
     const { data: order , error: errOrder, isLoading } = useGetOrderByIdQuery({ id });
     const [isDisabled, setIsDisabled] = useState(false);
-    const { data: vehicles , error: errorVehicle , isFetching} = useGetVehiclesQuery();
+    const { data: vehicles , error: errorVehicle , isFetching} = useGetVehiclesQuery(
+      { 
+        page: 0, 
+        perPage: 10
+      }
+    );
     const [updateOrder, status] = useUpdateOrderMutation();
     const [orderState, setOrderState] = useState<OrderDto>({
       id: 0,
@@ -120,11 +125,11 @@ import { InputError } from '../../types/InputError';
 
     useEffect(() => {
       if (status.isSuccess) {
-        enqueueSnackbar("Order updated successfully", { variant: "success" });
+        enqueueSnackbar("Ordem de serviço editada com sucesso", { variant: "success" });
         setIsDisabled(false);
       }
       if (status.error) {
-        enqueueSnackbar("Order not updated", { variant: "error" });
+        enqueueSnackbar("Ocorreu um erro ao editar a ordem de serviço", { variant: "error" });
       }
     }, [enqueueSnackbar, status.error, status.isSuccess]);
   
