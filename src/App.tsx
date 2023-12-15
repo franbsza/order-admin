@@ -1,12 +1,7 @@
 import * as React from 'react';
 import { Typography } from '@mui/material';
-import { Box, ThemeProvider } from '@mui/system';
-import Header from './components/Header';
-import { appTheme, darkTheme } from './config/theme';
+import { Box } from '@mui/system';
 import { Routes , Route } from 'react-router-dom';
-import { SnackbarProvider } from 'notistack'
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { CreateOrder } from './features/orders/CreateOrder';
 import { ListOrders } from './features/orders/ListOrders';
 import { ProtectedRoutes } from './components/ProtectedRoutes';
@@ -14,6 +9,12 @@ import { ListOrdersByUser } from './features/orders/ListOrderByUser';
 import { EditOrder } from './features/orders/EditOrder';
 import { Details } from './features/orders/Details';
 import { Layout } from './components/Layout';
+import { ListVehiclesByUser } from './features/vehicle/ListVehiclesByUser';
+import { ListTechnician } from './features/technician/ListTechnician';
+import { Home } from './components/Home';
+import { CreateVehicle } from './features/vehicle/CreateVehicle';
+import { CreateCustomer } from './features/customers/CreateCustomer';
+import { CustomerDetails } from './features/customers/CustomerDetails';
 
 function App(){
 
@@ -21,8 +22,41 @@ function App(){
 
 <Layout>
 <Routes>
+
   <Route 
-    path="/home" 
+    path="/" 
+    element={
+    <ProtectedRoutes 
+      rolesPropos={["ANONYMOUS", "USER", "STAFF", "ADMIN"]}> 
+      <Home/> 
+    </ProtectedRoutes>
+  }/>
+
+
+<Route 
+    path="/customers/create" 
+    element={
+    <ProtectedRoutes 
+      rolesPropos={["USER", "STAFF", "ADMIN"]}> 
+      <CreateCustomer /> 
+    </ProtectedRoutes>
+  }/>
+
+<Route 
+    path="/customers" 
+    element={
+    <ProtectedRoutes 
+      rolesPropos={["USER", "STAFF", "ADMIN"]}> 
+      <CustomerDetails /> 
+    </ProtectedRoutes>
+  }/>
+
+
+
+  {/* //ORDEM DE SERVIÇO */}
+
+  <Route 
+    path="/orders/all" 
     element={
     <ProtectedRoutes 
       rolesPropos={["STAFF"]}> 
@@ -52,7 +86,7 @@ function App(){
     path="/orders/edit/:id" 
     element={
     <ProtectedRoutes 
-      rolesPropos={["USER"]}>
+      rolesPropos={["USER", "STAFF", "ADMIN"]}>
       <EditOrder />
     </ProtectedRoutes>
   }/>
@@ -61,8 +95,47 @@ function App(){
     path="/orders/details/:id" 
     element={
     <ProtectedRoutes 
-      rolesPropos={["USER"]}>
+      rolesPropos={["USER", "STAFF", "ADMIN"]}>
       <Details />
+    </ProtectedRoutes>
+  }/>
+
+  {/* //VEÍCULOS */}
+
+  <Route 
+    path="/vehicles" 
+    element={
+    <ProtectedRoutes 
+      rolesPropos={["USER"]}>
+      <ListVehiclesByUser />
+    </ProtectedRoutes>
+  }/>
+
+<Route 
+    path="/vehicles/create" 
+    element={
+    <ProtectedRoutes 
+      rolesPropos={["USER"]}>
+      <CreateVehicle />
+    </ProtectedRoutes>
+  }/>
+
+<Route 
+    path="/vehicles/all" 
+    element={
+    <ProtectedRoutes
+      rolesPropos={["ADMIN"]}>
+      <ListVehiclesByUser />
+    </ProtectedRoutes>
+  }/>
+
+{/* //TÉCNICOS */} 
+<Route 
+    path="/technicians" 
+    element={
+    <ProtectedRoutes 
+      rolesPropos={["USER", "STAFF", "ADMIN"]}>
+      <ListTechnician />
     </ProtectedRoutes>
   }/>
 
@@ -72,13 +145,13 @@ function App(){
     element={
       <Box>
         <Typography 
-          variant="h1" 
-          component="h1">
+          variant="h5" 
+          component="h5">
             404
         </Typography>
         <Typography 
-          variant="h1" 
-          component="h1">
+          variant="h5" 
+          component="h5">
             Page not found
         </Typography>
       </Box>

@@ -1,14 +1,13 @@
 import { Box, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { useCancelOrderMutation, useGetOrdersQuery } from '../orders/SliceOrder';
 
 import { GridFilterModel } from '@mui/x-data-grid';
-import { OrderTable } from './components/OrderTable';
-import { useEffect, useState } from 'react';
-import { enqueueSnackbar } from 'notistack';
+import { TechnicianTable } from './components/TechnicianTable';
+import { useGetTechniciansQuery } from './SliceTechnician';
+import { useState } from 'react';
 import { Empty } from '../../components/Empty';
 
-export const ListOrders = () => {
+export const ListTechnician = () => {
 
 const [page, setPage] = useState(0);
 const [perPage, setPerPage] = useState(10);
@@ -20,9 +19,8 @@ const [options, setOptions] = useState({
   rowsPerPage: rowsPerPage
 });
 
-const { data, error , isFetching} = useGetOrdersQuery({ page: page, perPage: perPage});
-const [cancelOrder, { error: deleteError, isSuccess: deleteSuccess }] =
-useCancelOrderMutation();
+const { data, error , isFetching} = useGetTechniciansQuery({ page: page, perPage: perPage});
+const roles = JSON.parse(localStorage.getItem("roles") || "");
 
 function handleOnPageChange(page: number) {
   setPage(page+1);
@@ -40,20 +38,6 @@ function handleFilterChange(filterModel: GridFilterModel) {
   }
 }
 
-async function handleCancelOrder(id: string) {
-  await cancelOrder({ id });
-}
-
-useEffect(() => {
-  if (deleteSuccess) {
-    enqueueSnackbar(`Order cancelled`, { variant: "success" });
-  }
-  if (deleteError) {
-    enqueueSnackbar(`Order not cancelled`, { variant: "error" });
-  }
-}, [deleteSuccess, deleteError]);
-
-
 if (error) {
   return <Empty></Empty>;
 }
@@ -61,19 +45,20 @@ if (error) {
     return (
       
       <Box maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Box display="flex" justifyContent="flex-end">
+        <Box display="flex" justifyContent="flex-end" 
+        visibility={roles.includes("STAFF") ? "visible" : "hidden"}>
           <Button 
               variant="contained"
               component={Link}
               color="primary"
-              to="/orders/create"
+              to="/technicians/create"
               style={{ marginBottom: "1rem" }}
               >
-            Nova ordem de serviço
+            Novo cadastro
           </Button>
         </Box>
 
-        <OrderTable
+        <TechnicianTable
         data={data}
         isFetching={isFetching}
         perPage={options.perPage}
@@ -81,7 +66,6 @@ if (error) {
         handleOnPageChange={handleOnPageChange}
         handleOnPageSizeChange={handleOnPageSizeChange}
         handleFilterChange={handleFilterChange}
-        handleDelete={handleCancelOrder}
         />
       </Box>
     );

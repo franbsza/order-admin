@@ -15,7 +15,6 @@ import {
   import { VehicleResponse } from '../../../types/Vehicle';
   import { DatePicker } from '@mui/x-date-pickers';
 import { InputError } from '../../../types/InputError';
-import dayjs, { Dayjs } from 'dayjs';
   
   type Props = {
       order: OrderDto;

@@ -10,8 +10,9 @@ import {
     ListItemText,
   } from "@mui/material";
   import { Link } from "react-router-dom";
-  
+
   const drawerWidth = 240;
+  let roles = localStorage.getItem("roles") ? JSON.parse(localStorage.getItem("roles") || "") : ["ANONYMOUS"];
   
   type Props = {
     open: boolean;
@@ -19,13 +20,31 @@ import {
   };
   
   export default function ResponsiveDrawer({ open, onClose }: Props) {
-    const routes = [
-      { path: "/", name: "Orders" },
-      { path: "/vehicles", name: "Vehicles" },
-      { path: "/customers", name: "Customers" },
-      { path: "/videos", name: "Videos" },
-    ];
-  
+    let routes = []
+    routes = [
+        { path: "/", name: "Home" , roles: ["ANONYMOUS", "USER", "STAFF", "ADMIN"] },
+        { path: "/technicians", name: "Técnicos", roles: ["USER", "STAFF", "ADMIN"]},
+        { path: "/orders", name: "Ordens de Serviço" , roles: ["USER"]},
+        { path: "/vehicles", name: "Veículos" , roles: ["USER"]},
+        { path: "/customers", name: "Meu Cadastro" , roles: ["USER"]},
+        { path: "/orders/all", name: "Ordens de Serviço" , roles: ["STAFF", "ADMIN"]},
+        { path: "/customers/all", name: "Associados" , roles: ["STAFF", "ADMIN"]},
+        { path: "/vehicles/all", name: "Veículos" , roles: ["STAFF", "ADMIN"]}
+      ];
+
+      if(roles && roles.includes("STAFF")){
+        routes = routes.filter(function(value, index, arr){ 
+          return value.roles.includes("STAFF");
+      });
+      }
+      else{
+        if(roles && roles.includes("USER")){
+          routes = routes.filter(function(value, index, arr){ 
+            return value.roles.includes("USER");
+        });
+        }
+      }
+
     const drawer = (
       <div>
         <Toolbar>

@@ -1,23 +1,37 @@
 import { useParams } from "react-router-dom";
-import { useGetOrderByIdQuery } from "./SliceOrder";
-import { Box, Typography, Paper, TextField, Grid, FormControl, InputLabel, Button} from '@mui/material';
-import dayjs from "dayjs";
+import { Box, Typography, Paper, TextField, Grid, FormControl, Button} from '@mui/material';
 import { FormHelperText } from '@mui/material';
 import { Link } from "react-router-dom";
 import { Empty } from "../../components/Empty";
+import { useGetCustomerByIdQuery } from "./SliceCustomer";
 
-export const Details = () => {
+export const CustomerDetails = () => {
 
-    const id = useParams().id as string;
-    const { data: order , error: errOrder, isLoading } = useGetOrderByIdQuery({ id });
-
+    let email = JSON.parse(localStorage.getItem("user") || "").email;
+    const { data: customer , error: errOrder, isLoading } = useGetCustomerByIdQuery({ email });
 
     if(isLoading){
         return <h1>Loading...</h1>
     }
 
     if(errOrder){
-        return <Empty></Empty>
+        return (
+            <Box>
+            <Empty></Empty>
+            <Typography></Typography>
+            <Box display="flex" justifyContent="center">
+            <Button 
+                variant="contained"
+                component={Link}
+                color="primary"
+                to="/customers/create"
+                style={{ marginBottom: "1rem" }}
+                >
+                Complete seu cadastro
+            </Button>
+            </Box>
+        </Box>
+        );
     }
 
     return (
@@ -28,7 +42,7 @@ export const Details = () => {
               textAlign="center"
               variant="h5" 
               component="h5">
-                Detalhes ordem de serviço
+                Meus dados
               </Typography>
           </Box>
           <Box>
@@ -37,38 +51,26 @@ export const Details = () => {
               <Grid item xs={12} sm={6} md={4}>
                 <FormControl fullWidth >
                   <TextField
-                  id="vehicle" 
+                  id="name" 
                   type="text" 
-                  defaultValue={order?.vehicle.name} 
+                  defaultValue={customer?.firstName + " " + customer?.lastName} 
                   inputProps={
                     { readOnly: true }
                   } />
-                  <FormHelperText>Veículo</FormHelperText>
+                  <FormHelperText>Nome</FormHelperText>
                 </FormControl>
               </Grid>
 
               <Grid item xs={12} sm={6} md={4}>
-              <FormControl fullWidth >
-                <TextField
-                id="dateTime" type="text" 
-                defaultValue={ dayjs(order?.dateTime).format("DD/MM/YYYY")} 
-                inputProps={
-                  { readOnly: true }
-                } />
-              <FormHelperText>Data de solicitação</FormHelperText>
-              </FormControl>
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={4}>
-              <FormControl fullWidth >
-                <TextField
-                id="period" type="text" 
-                defaultValue={order?.period === "AFTERNOON" ? "Tarde" : "Manhã"} 
-                inputProps={
-                  { readOnly: true }
-                }
-                 />
-                <FormHelperText>Período</FormHelperText>
+                <FormControl fullWidth >
+                  <TextField
+                  id="name" 
+                  type="text" 
+                  defaultValue={customer?.email} 
+                  inputProps={
+                    { readOnly: true }
+                  } />
+                  <FormHelperText>Email</FormHelperText>
                 </FormControl>
               </Grid>
 
@@ -77,11 +79,11 @@ export const Details = () => {
                 <TextField
                 id="status" 
                 type="text" 
-                defaultValue={ order?.orderStatus } 
+                defaultValue={ customer?.phone } 
                 inputProps={
                   { readOnly: true }
                 } />
-                <FormHelperText>Status</FormHelperText>
+                <FormHelperText>Telefone</FormHelperText>
                 </FormControl>
               </Grid>
 
@@ -89,7 +91,7 @@ export const Details = () => {
               <FormControl fullWidth >
                 <TextField
                 id="street" type="text" 
-                defaultValue={order?.address.street} 
+                defaultValue={customer?.address.street} 
                 inputProps={
                   { readOnly: true }
                 } />
@@ -101,7 +103,7 @@ export const Details = () => {
               <FormControl fullWidth >
                 <TextField
                 id="number" type="text" 
-                defaultValue={order?.address.number} 
+                defaultValue={customer?.address.number} 
                 inputProps={
                   { readOnly: true }
                 } />
@@ -113,7 +115,7 @@ export const Details = () => {
               <FormControl fullWidth >
                 <TextField
                 id="neighborhood" type="text" 
-                defaultValue={order?.address.neighborhood} 
+                defaultValue={customer?.address.neighborhood} 
                 inputProps={
                   { readOnly: true }
                 } />
@@ -125,7 +127,7 @@ export const Details = () => {
               <FormControl fullWidth >
                 <TextField
                 id="city" type="text" 
-                defaultValue={order?.address.city} 
+                defaultValue={customer?.address.city} 
                 inputProps={
                   { readOnly: true }
                 } />
@@ -137,7 +139,7 @@ export const Details = () => {
               <FormControl fullWidth >
                 <TextField
                 id="state" type="text" 
-                defaultValue={order?.address.state} 
+                defaultValue={customer?.address.state} 
                 inputProps={
                   { readOnly: true }
                 } />
@@ -149,7 +151,7 @@ export const Details = () => {
               <FormControl fullWidth >
                 <TextField
                 id="zipCode" type="text" 
-                defaultValue={order?.address.zipCode} 
+                defaultValue={customer?.address.zipCode} 
                 inputProps={
                   { readOnly: true }
                 } />
@@ -157,36 +159,12 @@ export const Details = () => {
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12} sm={6} md={4}>
-              <FormControl fullWidth >
-                <TextField
-                id="expertTechnicianName" type="text" 
-                defaultValue={order?.expertTechnicianName || "sem técnico responsável"}  
-                inputProps={
-                  { readOnly: true }
-                } />
-                <FormHelperText>Técnico responsável</FormHelperText>
-                </FormControl>
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={4}>
-              <FormControl fullWidth >
-                <TextField
-                id="description" type="text" 
-                defaultValue={order?.description || "sem descricão"} 
-                inputProps={
-                  { readOnly: true }
-                } />
-                <FormHelperText>Descrição</FormHelperText>
-              </FormControl>
-              </Grid>
-
 
               <Grid item xs={12} sm={12} sx={{ m: 2, marginTop: 0}}>
                   <Box display="flex" gap={2} justifyContent="center">
                     <Button 
                       component={Link} 
-                      to="/orders"
+                      to="/"
                       variant="contained" 
                       color="primary">
                       Back
@@ -194,7 +172,7 @@ export const Details = () => {
 
                     <Button 
                       component={Link}
-                      to={`/orders/edit/${order?.id}`}
+                      to={`/customers/edit/${customer?.id}`}
                       variant="contained" 
                       color="success">
                       Editar

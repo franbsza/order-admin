@@ -4,9 +4,7 @@ import { useLocalStorage } from "./useLocalStorage";
 
 export function useAppTheme() {
   const [theme, setTheme] = useState(darkTheme);
-  const [soredThemeMode, setStoredThemeMode] = useLocalStorage<
-    "dark" | "light"
-  >("themeMode", "dark");
+  const [soredThemeMode, setStoredThemeMode] = useLocalStorage<"dark" | "light">("themeMode", "dark");
 
   const toggleTheme = () => {
     const currentTheme = theme.palette.mode === "dark" ? lightTheme : darkTheme;

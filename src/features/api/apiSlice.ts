@@ -4,7 +4,7 @@ const baseUrl = "http://localhost:8090/api";
 
 export const apiSlice = createApi({
     reducerPath: "api",
-    tagTypes: [ "Orders", "Vehicles"],
+    tagTypes: [ "Orders", "Vehicles", "Technicians", "Customers" ],
     endpoints: (builder) => ({}),
     baseQuery: fetchBaseQuery({ 
         baseUrl: baseUrl ,
