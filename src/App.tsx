@@ -59,7 +59,7 @@ function App(){
     path="/orders/all" 
     element={
     <ProtectedRoutes 
-      rolesPropos={["STAFF"]}> 
+      rolesPropos={["STAFF", "ADMIN"]}> 
       <ListOrders /> 
     </ProtectedRoutes>
   }/>
@@ -68,7 +68,7 @@ function App(){
     path="/orders" 
     element={
     <ProtectedRoutes 
-      rolesPropos={["USER"]}>
+      rolesPropos={["USER", "STAFF", "ADMIN"]}>
       <ListOrdersByUser />
     </ProtectedRoutes>
   }/>
@@ -77,7 +77,7 @@ function App(){
     path="/orders/create" 
     element={
     <ProtectedRoutes 
-      rolesPropos={["USER"]}>
+      rolesPropos={["USER", "STAFF", "ADMIN"]}>
       <CreateOrder />
     </ProtectedRoutes>
   }/>
@@ -106,7 +106,7 @@ function App(){
     path="/vehicles" 
     element={
     <ProtectedRoutes 
-      rolesPropos={["USER"]}>
+      rolesPropos={["USER", "STAFF", "ADMIN"]}>
       <ListVehiclesByUser />
     </ProtectedRoutes>
   }/>
@@ -115,7 +115,7 @@ function App(){
     path="/vehicles/create" 
     element={
     <ProtectedRoutes 
-      rolesPropos={["USER"]}>
+      rolesPropos={["USER", "STAFF", "ADMIN"]}>
       <CreateVehicle />
     </ProtectedRoutes>
   }/>
@@ -124,7 +124,7 @@ function App(){
     path="/vehicles/all" 
     element={
     <ProtectedRoutes
-      rolesPropos={["ADMIN"]}>
+      rolesPropos={["STAFF", "ADMIN"]}>
       <ListVehiclesByUser />
     </ProtectedRoutes>
   }/>
