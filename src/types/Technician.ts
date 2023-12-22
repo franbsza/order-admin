@@ -1,18 +1,17 @@
-export interface Technician{
+export interface TechnicianDto{
     id: number;
     name: string;
     email: string;
     phone: string;
     isActive: boolean;
     documentNumber: string;
-    description: string;
     isPartner: boolean;
     personalAddress: PersonalAddress;
     }
   
     export interface TechnicianResponse {
       meta: Meta;
-      data: Technician[];
+      data: TechnicianDto[];
     }
   
     export interface Meta {
@@ -37,11 +36,16 @@ export interface Technician{
         state: string;
         zipCode: string;
         neighborhood: string;
-        number: number;
+        number: string;
         baseAddress: BaseAddress;
     }
 
     export interface BaseAddress{
       id: number;
       region: string;
+    }
+
+    export interface BaseAddressResponse {
+      meta: Meta;
+      data: BaseAddress[];
     }

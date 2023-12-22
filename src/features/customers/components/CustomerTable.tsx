@@ -1,4 +1,3 @@
-import { OrderResponse } from "../../../types/Order";
 import { 
     DataGrid ,  
     GridColDef, 
@@ -6,32 +5,30 @@ import {
     GridToolbar,
     GridFilterModel
   } from '@mui/x-data-grid';
-import { Box,IconButton, Typography } from '@mui/material';
+import { Box, IconButton } from '@mui/material';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
-import BlockIcon from '@mui/icons-material/Block';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Link } from 'react-router-dom';
+import { CustomerResponse } from '../../../types/Customer';
 
 type Props = {
-    data: OrderResponse | undefined;
+    data: CustomerResponse | undefined;
     perPage: number;
     isFetching: boolean;
     rowsPerPage?: number[];
     handleOnPageChange: (page:number) => void;
     handleFilterChange: (filterModel: GridFilterModel) => void;
     handleOnPageSizeChange: (perPage: number) => void;
-    handleDelete: (id: string) => void;
   }
 
-export function OrderTable({
+export function CustomerTable({
     data,
     perPage,
     isFetching,
     rowsPerPage,
     handleOnPageChange,
     handleFilterChange,
-    handleOnPageSizeChange, 
-    handleDelete 
+    handleOnPageSizeChange
 }: Props){
 
     const componentProps={
@@ -43,72 +40,84 @@ export function OrderTable({
 
     const columns: GridColDef[] = [
         { 
-          field: "dateTime", 
-          headerName: "Data", 
+          field: "id", 
+          headerName: "ID", 
           flex: 1 
         },
         { 
-          field: "orderStatus", 
+          field: "firstName", 
+          headerName: "Nome", 
+          flex: 1 
+        },
+        { 
+          field: "status", 
           headerName: "Status", 
           flex: 1,
           renderCell: renderStatusCell
         },
         { 
-          field: "period", 
-          headerName: "Período", 
-          flex: 1 ,
-          renderCell: renderPeriodCell
+          field: "phone", 
+          headerName: "Telefone", 
+          flex: 1,
+          type: "string"
         },
         { 
-          field: "vehicleName", 
-          headerName: "Veículo", 
-          flex: 1
+            field: "email", 
+            headerName: "Email", 
+            flex: 1,
+            type: "string"
+        },
+        { 
+            field: "neighborhood", 
+            headerName: "Bairro", 
+            flex: 1 ,
+            type: "string"
         },
         { 
           field: "detailsAction", 
-          headerName: "Details", 
+          headerName: "Detalhes", 
           flex: 0.5 ,
           renderCell: renderDetailsActionCell
         },
         { 
           field: "editAction", 
-          headerName: "Edit", 
+          headerName: "Editar", 
           flex: 0.5 ,
           renderCell: renderEditActionCell
         }
       ];
 
-      function mapDataToGridRows(data: OrderResponse) {
-        const { data: orders } = data;
-        return orders.map((order) => ({
-          id: order.id,
-          description: order.description,
-          orderStatus: order.orderStatus,
-          period: order.period,
-          dateTime: new Date(order.dateTime).toLocaleDateString("pt-BR"),
-          vehicleName: order.vehicle.name,
+      function mapDataToGridRows(data: CustomerResponse) {
+        const { data: customers } = data;
+        return customers.map((customer) => ({
+          id: customer.id,
+          firstName: customer.firstName + " " + customer.lastName,
+          status: customer.status,
+          phone: customer.phone,
+          email: customer.email,
+          neighborhood: customer.address.neighborhood,
         }));
       }
 
       function mapStatus(status: string){
         switch (status) {
-          case "OPEN":
-            return "Em aberto";
-          case "IN_PROGRESS":
-            return "Em andamento";
-          case "PENDING":
-            return "Pendente";
-          case "CANCELED":
-            return "Cancelada";
-          case "COMPLETED_SUCCESS":
-            return "Concluído";
+          case "PENDING_ACTIVATION":
+            return "Ativação pendente";
+          case "ACTIVE":
+            return "Ativo";
+          case "INACTIVE":
+            return "Inativo";
+          case "BLOCKED":
+            return "Bloqueado";
+          case "FINANCIAL_PENDING":
+            return "Pendência financeira";
           default:
             return "Indefinido";
         }
       }
 
       function renderStatusCell(rowData: GridRenderCellParams) {
-        let status = rowData.row.orderStatus;
+        let status = rowData.row.status;
         return (
           <span>{mapStatus(status)}</span>
         );
@@ -116,8 +125,7 @@ export function OrderTable({
 
       function renderDetailsActionCell(rowData: GridRenderCellParams) {
         return (
-
-        <Link to={`/orders/details/${rowData.id}`} 
+        <Link to={`/customers/details/${rowData.row.email}`} 
         style={{ textDecoration: "none" }}
         >
             <IconButton>
@@ -129,28 +137,13 @@ export function OrderTable({
       
       function renderEditActionCell(rowData: GridRenderCellParams) {
         return (
-        <Link to={`/orders/edit/${rowData.id}`} 
+        <Link to={`/customers/edit/${rowData.row.id}`} 
         style={{ textDecoration: "none" }}
         >
             <IconButton>
               <BorderColorIcon color='primary'/>
             </IconButton>
             </Link>
-        )
-      }
-      
-      function renderPeriodCell(rowData: GridRenderCellParams) {
-        var periodTranslated = null;
-        if(rowData.value === "MORNING"){
-          periodTranslated = "Manhã";
-        }
-        else{
-          periodTranslated = "Tarde";
-        }
-        return (
-          <Typography>
-            {periodTranslated}
-          </Typography>
         )
       }
 

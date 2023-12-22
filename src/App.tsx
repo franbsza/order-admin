@@ -3,7 +3,6 @@ import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { Routes , Route } from 'react-router-dom';
 import { CreateOrder } from './features/orders/CreateOrder';
-import { ListOrders } from './features/orders/ListOrders';
 import { ProtectedRoutes } from './components/ProtectedRoutes';
 import { ListOrdersByUser } from './features/orders/ListOrderByUser';
 import { EditOrder } from './features/orders/EditOrder';
@@ -15,6 +14,10 @@ import { Home } from './components/Home';
 import { CreateVehicle } from './features/vehicle/CreateVehicle';
 import { CreateCustomer } from './features/customers/CreateCustomer';
 import { CustomerDetails } from './features/customers/CustomerDetails';
+import { ListCustomers } from './features/customers/ListCustomers';
+import { EditCustomer } from './features/customers/EditCustomer';
+import { CreateTechnician } from './features/technician/CreateTechnician';
+import { EditTechnician } from './features/technician/EditTechnician';
 
 function App(){
 
@@ -23,21 +26,20 @@ function App(){
 <Layout>
 <Routes>
 
-  <Route 
+<Route 
     path="/" 
     element={
     <ProtectedRoutes 
-      rolesPropos={["ANONYMOUS", "USER", "STAFF", "ADMIN"]}> 
+      rolesParam={["ANONYMOUS", "USER", "STAFF", "ADMIN"]}> 
       <Home/> 
     </ProtectedRoutes>
   }/>
-
 
 <Route 
     path="/customers/create" 
     element={
     <ProtectedRoutes 
-      rolesPropos={["USER", "STAFF", "ADMIN"]}> 
+      rolesParam={["USER", "STAFF", "ADMIN"]}> 
       <CreateCustomer /> 
     </ProtectedRoutes>
   }/>
@@ -46,29 +48,36 @@ function App(){
     path="/customers" 
     element={
     <ProtectedRoutes 
-      rolesPropos={["USER", "STAFF", "ADMIN"]}> 
+      rolesParam={["STAFF", "ADMIN"]}> 
+      <ListCustomers /> 
+    </ProtectedRoutes>
+  }/>
+
+<Route 
+    path="/customers/details/:email" 
+    element={
+    <ProtectedRoutes 
+      rolesParam={["USER", "STAFF", "ADMIN"]}> 
       <CustomerDetails /> 
     </ProtectedRoutes>
   }/>
 
-
-
-  {/* //ORDEM DE SERVIÇO */}
-
-  <Route 
-    path="/orders/all" 
+<Route 
+    path="/customers/edit/:id" 
     element={
     <ProtectedRoutes 
-      rolesPropos={["STAFF", "ADMIN"]}> 
-      <ListOrders /> 
+      rolesParam={["USER","STAFF", "ADMIN"]}> 
+      <EditCustomer /> 
     </ProtectedRoutes>
   }/>
+
+  {/* //ORDEM DE SERVIÇO */}
 
   <Route 
     path="/orders" 
     element={
     <ProtectedRoutes 
-      rolesPropos={["USER", "STAFF", "ADMIN"]}>
+      rolesParam={["USER", "STAFF", "ADMIN"]}>
       <ListOrdersByUser />
     </ProtectedRoutes>
   }/>
@@ -77,7 +86,7 @@ function App(){
     path="/orders/create" 
     element={
     <ProtectedRoutes 
-      rolesPropos={["USER", "STAFF", "ADMIN"]}>
+      rolesParam={["USER", "STAFF", "ADMIN"]}>
       <CreateOrder />
     </ProtectedRoutes>
   }/>
@@ -86,7 +95,7 @@ function App(){
     path="/orders/edit/:id" 
     element={
     <ProtectedRoutes 
-      rolesPropos={["USER", "STAFF", "ADMIN"]}>
+      rolesParam={["USER", "STAFF", "ADMIN"]}>
       <EditOrder />
     </ProtectedRoutes>
   }/>
@@ -95,7 +104,7 @@ function App(){
     path="/orders/details/:id" 
     element={
     <ProtectedRoutes 
-      rolesPropos={["USER", "STAFF", "ADMIN"]}>
+      rolesParam={["USER", "STAFF", "ADMIN"]}>
       <Details />
     </ProtectedRoutes>
   }/>
@@ -106,7 +115,7 @@ function App(){
     path="/vehicles" 
     element={
     <ProtectedRoutes 
-      rolesPropos={["USER", "STAFF", "ADMIN"]}>
+      rolesParam={["USER", "STAFF", "ADMIN"]}>
       <ListVehiclesByUser />
     </ProtectedRoutes>
   }/>
@@ -115,7 +124,7 @@ function App(){
     path="/vehicles/create" 
     element={
     <ProtectedRoutes 
-      rolesPropos={["USER", "STAFF", "ADMIN"]}>
+      rolesParam={["USER", "STAFF", "ADMIN"]}>
       <CreateVehicle />
     </ProtectedRoutes>
   }/>
@@ -124,7 +133,7 @@ function App(){
     path="/vehicles/all" 
     element={
     <ProtectedRoutes
-      rolesPropos={["STAFF", "ADMIN"]}>
+      rolesParam={["STAFF", "ADMIN"]}>
       <ListVehiclesByUser />
     </ProtectedRoutes>
   }/>
@@ -134,8 +143,26 @@ function App(){
     path="/technicians" 
     element={
     <ProtectedRoutes 
-      rolesPropos={["USER", "STAFF", "ADMIN"]}>
+      rolesParam={["USER", "STAFF", "ADMIN"]}>
       <ListTechnician />
+    </ProtectedRoutes>
+  }/>
+
+  <Route 
+    path="/technicians/create" 
+    element={
+    <ProtectedRoutes 
+      rolesParam={["STAFF", "ADMIN"]}>
+      <CreateTechnician />
+    </ProtectedRoutes>
+  }/>
+
+<Route 
+    path="/technicians/edit/:id" 
+    element={
+    <ProtectedRoutes 
+      rolesParam={["STAFF", "ADMIN"]}>
+      <EditTechnician />
     </ProtectedRoutes>
   }/>
 

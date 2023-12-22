@@ -4,8 +4,10 @@ import { GridFilterModel } from '@mui/x-data-grid';
 import { VehicleTable } from './components/VehicleTable';
 import { useEffect, useState } from 'react';
 import { enqueueSnackbar } from 'notistack';
-import { useCancelVehicleMutation, useGetVehiclesQuery } from './SliceVehicle';
+import { useGetVehiclesQuery, useUpdateVehicleMutation } from './SliceVehicle';
 import { Empty } from '../../components/Empty';
+import { useAppSelector } from '../../app/hooks';
+import { selectRoles, selectUserDetails } from '../auth/SliceAuth';
 
 export const ListVehiclesByUser = () => {
 
@@ -19,15 +21,18 @@ const [options, setOptions] = useState({
   rowsPerPage: rowsPerPage,
 });
 
-const user = JSON.parse(localStorage.getItem("user") || "");
+const roles = useAppSelector(selectRoles) as Array<string>;
+const userDetails = useAppSelector(selectUserDetails);
+const email = roles.includes("USER") ? userDetails.email : "";
+
 const { data, error , isFetching} = useGetVehiclesQuery({ 
     page: page, 
     perPage: perPage, 
-    email: user.email 
+    email: email
 });
 
-const [cancelRegister, { error: deleteError, isSuccess: deleteSuccess }] =
-useCancelVehicleMutation();
+const [handleDesactivateVehicle, { error: deleteError, isSuccess: deleteSuccess }] =
+useUpdateVehicleMutation();
 
 function handleOnPageChange(page: number) {
   setPage(page+1);
@@ -41,32 +46,32 @@ function handleOnPageSizeChange(perPage: number) {
 
 function handleFilterChange(filterModel: GridFilterModel) {
     if (!filterModel.quickFilterValues?.length) {
-        return setOptions({ ...options});
-      }
+      return setOptions({ ...options});
+    }
 }
 
 async function handleVehicleDelete(id: string) {
-  await cancelRegister({ id });
+  await handleDesactivateVehicle({ id });
 }
 
 useEffect(() => {
   if (deleteSuccess) {
-    enqueueSnackbar(`Veiculo excluído`, { variant: "success" });
+    enqueueSnackbar(`Veiculo desativado`, { variant: "success" });
   }
   if (deleteError) {
-    enqueueSnackbar(`Veiculo não excluído`, { variant: "error" });
+    enqueueSnackbar(`Houve um erro ao desativar o veiculo`, { variant: "error" });
   }
 }, [deleteSuccess, deleteError]);
 
-
-if (error) {
-  return <Empty></Empty>;
-}
+  if (error) {
+    return <Empty></Empty>;
+  }
 
     return (
       
       <Box maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Box display="flex" justifyContent="flex-end">
+        <Box display="flex" justifyContent="flex-end" 
+        visibility={roles.includes("USER") ? "visible" : "hidden"}>
           <Button 
               variant="contained"
               component={Link}

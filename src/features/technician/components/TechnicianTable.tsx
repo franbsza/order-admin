@@ -56,7 +56,7 @@ export function TechnicianTable({
         },
         { 
           field: "region", 
-          headerName: "Region", 
+          headerName: "Região", 
           flex: 1,
           type: "string"
         },
@@ -71,12 +71,6 @@ export function TechnicianTable({
             headerName: "Ativo", 
             flex: 0.5 ,
             renderCell: renderIsActiveCell
-        },
-        { 
-          field: "detailsAction", 
-          headerName: "Detalhes", 
-          flex: 0.5 ,
-          renderCell: renderDetailsActionCell
         },
         { 
           field: "editAction", 
@@ -104,19 +98,6 @@ export function TechnicianTable({
           <Typography color={rowData.value ? "primary" : "secondary"}>
             {rowData.value ? "Sim" : "Não"}
           </Typography>
-        )
-      }
-
-      function renderDetailsActionCell(rowData: GridRenderCellParams) {
-        return (
-
-        <Link to={`/technicians/details/${rowData.id}`} 
-        style={{ textDecoration: "none" }}
-        >
-            <IconButton>
-              <VisibilityIcon color='info'/>
-            </IconButton>
-            </Link>
         )
       }
       
@@ -147,7 +128,7 @@ export function TechnicianTable({
             loading={isFetching}
             paginationMode="server"
             checkboxSelection={false}
-            disableColumnFilter={false}
+            disableColumnFilter={true}
             disableColumnSelector={true}
             disableDensitySelector={true}
             rowsPerPageOptions={rowsPerPage}

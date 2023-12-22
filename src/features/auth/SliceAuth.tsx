@@ -1,10 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 
+export const User = {
+    name: "",
+    email: "",
+    given_name: "",
+    family_name: "",
+}
+
 const initialState = {
     token: "",
     isLoading: false,
-    userDetails: null,
+    userDetails: User,
     isAuthenticated: false,
     roles: [],
 };
@@ -36,5 +43,7 @@ export const { setAuthenticated, setIsLoading, setUserDetails, setToken, setRole
 export const selectIsAuthenticated = (state: RootState) => state.auth.isAuthenticated;
 export const selectIsLoading = (state: RootState) => state.auth.isLoading;
 export const selectRoles = (state: RootState) => state.auth.roles;
+export const selectUserDetails = (state: RootState) => state.auth.userDetails;
+export const selectToken = (state: RootState) => state.auth.token;
 
 export default authSlice.reducer;

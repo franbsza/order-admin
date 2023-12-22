@@ -6,6 +6,8 @@ import { OrderTable } from './components/OrderTable';
 import { useEffect, useState } from 'react';
 import { enqueueSnackbar } from 'notistack';
 import { Empty } from '../../components/Empty';
+import { useAppSelector } from '../../app/hooks';
+import { selectRoles, selectUserDetails } from '../auth/SliceAuth';
 
 export const ListOrdersByUser = () => {
 
@@ -19,11 +21,14 @@ const [options, setOptions] = useState({
   rowsPerPage: rowsPerPage,
 });
 
-const user = JSON.parse(localStorage.getItem("user") || "");
+const roles = useAppSelector(selectRoles) as Array<string>;
+const userDetails = useAppSelector(selectUserDetails);
+const email = roles.includes("USER") ? userDetails.email : "";
+
 const { data, error , isFetching} = useGetOrdersQuery({ 
     page: page, 
     perPage: perPage, 
-    email: user.email 
+    email: email, 
 });
 
 const [cancelOrder, { error: deleteError, isSuccess: deleteSuccess }] =
@@ -64,9 +69,9 @@ if (error) {
 }
 
     return (
-      
+
       <Box maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Box display="flex" justifyContent="flex-end">
+        <Box display="flex" justifyContent="flex-end" visibility={roles.includes("USER") ? "visible" : "hidden"}>
           <Button 
               variant="contained"
               component={Link}

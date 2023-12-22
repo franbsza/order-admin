@@ -1,38 +1,42 @@
 import React from "react";
-import { Navigate, useLocation } from "react-router-dom";
 import { AccessDenied } from "../features/auth/AccessDenied";
+import {
+  selectIsAuthenticated,
+  selectRoles
+} from "../features/auth/SliceAuth";
+import { useAppSelector } from "../app/hooks";
+import { Home } from "./Home";
 
 export const ProtectedRoutes = ({
   children,
-  rolesPropos,
+  rolesParam,
 }: {
   children: React.ReactNode;
-  rolesPropos: Array<string>;
+  rolesParam: Array<string>;
 }) => {
-  let location = useLocation();
-  let isAuthenticated = localStorage.getItem("isAuthenticated") ? JSON.parse(localStorage.getItem("isAuthenticated") || "") : false;
-  let roles = localStorage.getItem("roles") ? JSON.parse(localStorage.getItem("roles") || "") : [];
+  const location = window.location;
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const roles = useAppSelector(selectRoles);
+  let rolePermitted = false;
 
   if(roles){
-    let rolePermitted = false;
-      for (var role of rolesPropos) {
-         if(roles.includes(role)) {
+    roles.forEach(function(role){ 
+      rolesParam.forEach(function(roleParam){
+        if(role === roleParam){
           rolePermitted = true;
-          break;
-         }
-      }
-
-      const isPermitted = isAuthenticated && rolePermitted ? true : false;
-
-      if (!isAuthenticated || !isPermitted) {
-        console.log("User has required role");
-        return <AccessDenied />;
-      }
-
-      if (!isAuthenticated) {
-        return <Navigate to="/login" state={{ from: location }} />;
-      }
+          return true;
+        };
+      });
+    });  
   }
 
+  const isPermitted = isAuthenticated && rolePermitted ? true : false;
+
+  if (!isPermitted) {
+    if(location.pathname === '/customers'){
+      return <Home/> ;
+    }
+    return <AccessDenied />;
+  }
   return <>{children}</>;
 };

@@ -27,13 +27,17 @@ function createCustomerMutation(customerRequest: CustomerDto) {
     return query.toString();
 }
 
-function getCustomers({page=0, perPage=10, email=""}){
-    const params = {page: page, perPage: perPage, email: email}; 
+function getCustomers({page=0, perPage=10}){
+    const params = {page: page, perPage: perPage}; 
     return `${endpointUrl}?${parseQueryParams(params)}`
 }
 
-function getCustomerById({ email }: { email: string}) {
+function getCustomerByEmail({ email }: {email: string}) {
     return `${endpointUrl}/email/${email}`;
+}
+
+function getCustomerById({ id }: {id: string}) {
+    return `${endpointUrl}/${id}`;
 }
 
 function updateCustomerMutation(customer: CustomerDto) {
@@ -57,8 +61,12 @@ export const CustomersApiSlice = apiSlice.injectEndpoints({
             query: createCustomerMutation,
             invalidatesTags: ["Customers"]
         }),
-        getCustomerById: query<CustomerDto, {email: string}>({
+        getCustomerById: query<CustomerDto, {id: string}>({
             query: getCustomerById,
+            providesTags: ["Customers"]
+        }),
+        getCustomerByEmail: query<CustomerDto, {email: string}>({
+            query: getCustomerByEmail,
             providesTags: ["Customers"]
         }),
         getCustomers: query<CustomerResponse, CustomerParams>({
@@ -79,6 +87,7 @@ export const CustomersApiSlice = apiSlice.injectEndpoints({
 export const {
     useCreateCustomerMutation,
     useGetCustomersQuery,
+    useGetCustomerByEmailQuery, 
     useGetCustomerByIdQuery,
     useUpdateCustomerMutation,
     useCancelCustomerMutation
