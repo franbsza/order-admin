@@ -1,42 +1,68 @@
 import { Box, Typography, Paper, SelectChangeEvent } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useSnackbar } from 'notistack';
-import { CustomerDto } from '../../types/Customer';
-import { CustomerForm } from './components/CustomerForm';
-import { useCreateCustomerMutation } from './SliceCustomer';
-import { useAppSelector } from '../../app/hooks';
-import { selectRoles, selectUserDetails } from '../auth/SliceAuth';
+import { TechnicianDto } from '../../types/Technician';
+import { useCreateTechnicianMutation } from './SliceTechnician';
+import { TechnicianForm } from './components/TechnicianForm';
 
-export const CreateCustomer = () => {
+export const CreateTechnician = () => {
 
   const { enqueueSnackbar } = useSnackbar();
-  const [createCustomer, { error, isSuccess }] = useCreateCustomerMutation();
+  const [createTechnician, { error, isSuccess }] = useCreateTechnicianMutation();
   const [isDisabled, setIsDisabled] = useState(false);
   const [isLoading] = useState(false);
-  const [errors, setErrors] = useState({})
-  const userDetails = useAppSelector(selectUserDetails);
-  const [isRolePermitted, setIsRolePermitted] = useState(true);
-  const roles = useAppSelector(selectRoles) as string[];
-  const [customerState, setCustomerState] = useState<CustomerDto>({
+  const [errors, setErrors] = useState({});
+  const [technicianState, setTechnicianState] = useState<TechnicianDto>({
     id: 0,
-    firstName: userDetails.given_name,
-    lastName: userDetails.family_name,
-    status: "PENDING_ACTIVATION",
+    name: "",
+    email: "",
     phone: "",
-    email: userDetails.email,
-    address: {
+    isActive: true,
+    documentNumber: "",
+    isPartner: true,
+    personalAddress: {
       id: 0,
-      street: "",
-      number: "",
-      neighborhood: "",
+      address: "",
       city: "",
       state: "",
-      zipCode: ""
+      zipCode: "",
+      neighborhood: "",
+      number: "",
+      baseAddress: {
+        id: 0,
+        region: ""
+      }
     }
   });
 
 
   const formValidation = (value: String, name: String) => {
+    if(name === "documentNumber"){ 
+        if(value === ""){
+            setErrors({ ...errors, documentNumber: "documento não pode ser vazio." });
+        }
+        else{
+            setErrors({ ...errors, documentNumber: ""});
+        }
+    }
+
+    if(name === "name"){ 
+        if(value === ""){
+            setErrors({ ...errors, name: "nome não pode ser vazio." });
+        }
+        else{
+            setErrors({ ...errors, name: ""});
+        }
+    }
+
+    if(name === "email"){ 
+        if((value === "" || value.length < 12)){
+            setErrors({ ...errors, email: "email não pode ser vazio." });
+        }
+        else{
+            setErrors({ ...errors, email: ""});
+        }
+    }
 
     if(name === "phone") {
         if((value === "" || value.length < 12)){
@@ -47,7 +73,7 @@ export const CreateCustomer = () => {
         }
     }
     
-    if (name === "street") {
+    if (name === "address") {
         if(value === ""){
             setErrors({ ...errors, street: "endereço não pode ser vazio."});
         }
@@ -113,46 +139,51 @@ export const CreateCustomer = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
       formValidation(value, name);
-      if(name === "phone"){
-        setCustomerState({ ...customerState, phone: value });
+      if(name === "documentNumber" || name === "name" || name === "email" || name === "phone"){ 
+        setTechnicianState({ ...technicianState, [name]: value });
       }
       else{
-        setCustomerState({ 
-            ...customerState, 
-            address: {...customerState.address, [name]: value }
+        setTechnicianState({ 
+            ...technicianState, 
+            personalAddress: {...technicianState.personalAddress, [name]: value }
         });
       }
     }
 
-    const hadleSelectChange = (e: SelectChangeEvent<String>) => {
-      const { name, value } = e.target;
-      if(roles.includes("STAFF") || roles.includes("ADMIN")){ 
-          setCustomerState({ ...customerState, [name]: value });
-      }else{
-          setIsRolePermitted(false);
-      }
+    const hadleSelectChange = (e: SelectChangeEvent<Number>) => {
+      const { value } = e.target;
+        setTechnicianState(
+            {
+                ...technicianState,
+                personalAddress: {
+                    ...technicianState.personalAddress,
+                    baseAddress: {
+                        ...technicianState.personalAddress.baseAddress,
+                        id: Number(value)
+                    }
+                }
+            }
+        );
    };
+
+   const handleToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+    setTechnicianState({ ...technicianState, [name]: checked });
+  };
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>){
     e.preventDefault();
     setIsDisabled(true);
-    await createCustomer(customerState);
+    await createTechnician(technicianState);
   };
 
   useEffect(() => {
-    if (!isRolePermitted) {
-      enqueueSnackbar("Você não tem permissão para alterar o status", { variant: "error" });
-    }
-  }, [isRolePermitted, enqueueSnackbar]);
-
-
-  useEffect(() => {
     if(isSuccess){
-      enqueueSnackbar("Cadastro concluído", { variant: "success" });
+      enqueueSnackbar("Cadastro realizado", { variant: "success" });
       setIsDisabled(true);
     }
     if(error){
-        enqueueSnackbar("Erro ao se cadastrar", { variant: "error" });
+        enqueueSnackbar("Erro ao cadastrar tecnico", { variant: "error" });
     }
   }, [enqueueSnackbar, isSuccess, error]);
 
@@ -165,20 +196,21 @@ export const CreateCustomer = () => {
               textAlign="center"
               variant="h5" 
               component="h5">
-                Complete seu cadastro
+                Cadatre o tecnico
               </Typography>
           </Box>
 
-          <CustomerForm
-          customer={customerState}
+          <TechnicianForm
+          technician={technicianState}
           errors={errors}
           isDisabled={isDisabled}
           isLoading={isLoading}
           handleSubmit={handleSubmit}
           hadleChange={handleChange}
           hadleSelectChange={hadleSelectChange}
+          handleToggle={handleToggle}
           />
         </Paper>
       </Box>
    );
-  }
+}

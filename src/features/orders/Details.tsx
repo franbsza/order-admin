@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useGetOrderByIdQuery } from "./SliceOrder";
-import { Box, Typography, Paper, TextField, Grid, FormControl, InputLabel, Button} from '@mui/material';
+import { Box, Typography, Paper, TextField, Grid, FormControl, Button} from '@mui/material';
 import dayjs from "dayjs";
 import { FormHelperText } from '@mui/material';
 import { Link } from "react-router-dom";
@@ -10,7 +10,23 @@ export const Details = () => {
 
     const id = useParams().id as string;
     const { data: order , error: errOrder, isLoading } = useGetOrderByIdQuery({ id });
-
+    
+    function mapStatus(status: String) {
+      switch (status) {
+        case "OPEN":
+          return "Em aberto";
+        case "IN_PROGRESS":
+          return "Em andamento";
+        case "PENDING":
+          return "Pendente";
+        case "CANCELED":
+          return "Cancelado";
+        case "COMPLETED_SUCCESS":
+          return "Concluído";
+        default:
+          return "Indefinido";
+      } 
+    }
 
     if(isLoading){
         return <h1>Loading...</h1>
@@ -33,6 +49,19 @@ export const Details = () => {
           </Box>
           <Box>
             <Grid container spacing={2} sx={{p: 2}}>
+
+            <Grid item xs={12} sm={6} md={4}>
+                <FormControl fullWidth >
+                  <TextField
+                  id="email do associado" 
+                  type="text" 
+                  defaultValue={order?.email} 
+                  inputProps={
+                    { readOnly: true }
+                  } />
+                  <FormHelperText>Email do associado</FormHelperText>
+                </FormControl>
+              </Grid>
 
               <Grid item xs={12} sm={6} md={4}>
                 <FormControl fullWidth >
@@ -77,7 +106,7 @@ export const Details = () => {
                 <TextField
                 id="status" 
                 type="text" 
-                defaultValue={ order?.orderStatus } 
+                defaultValue={ mapStatus(order?.orderStatus || 'Indefinido') } 
                 inputProps={
                   { readOnly: true }
                 } />
@@ -168,19 +197,6 @@ export const Details = () => {
                 <FormHelperText>Técnico responsável</FormHelperText>
                 </FormControl>
               </Grid>
-
-              <Grid item xs={12} sm={6} md={4}>
-              <FormControl fullWidth >
-                <TextField
-                id="description" type="text" 
-                defaultValue={order?.description || "sem descricão"} 
-                inputProps={
-                  { readOnly: true }
-                } />
-                <FormHelperText>Descrição</FormHelperText>
-              </FormControl>
-              </Grid>
-
 
               <Grid item xs={12} sm={12} sx={{ m: 2, marginTop: 0}}>
                   <Box display="flex" gap={2} justifyContent="center">

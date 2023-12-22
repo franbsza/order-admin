@@ -1,15 +1,12 @@
-import { Box, Button } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Box } from '@mui/material';
 
 import { GridFilterModel } from '@mui/x-data-grid';
-import { TechnicianTable } from './components/TechnicianTable';
-import { useGetTechniciansQuery } from './SliceTechnician';
-import { useState } from 'react';
 import { Empty } from '../../components/Empty';
-import { useAppSelector } from '../../app/hooks';
-import { selectRoles } from '../auth/SliceAuth';
+import { CustomerTable } from './components/CustomerTable';
+import { useGetCustomersQuery } from './SliceCustomer';
+import { useState } from 'react';
 
-export const ListTechnician = () => {
+export const ListCustomers= () => {
 
 const [page, setPage] = useState(0);
 const [perPage, setPerPage] = useState(10);
@@ -21,8 +18,7 @@ const [options, setOptions] = useState({
   rowsPerPage: rowsPerPage
 });
 
-const { data, error , isFetching} = useGetTechniciansQuery({ page: page, perPage: perPage});
-const roles = useAppSelector(selectRoles) as string[];
+const { data, error , isFetching} = useGetCustomersQuery({ page: page, perPage: perPage});
 
 function handleOnPageChange(page: number) {
   setPage(page+1);
@@ -44,23 +40,9 @@ if (error) {
   return <Empty></Empty>;
 }
 
-return (
-  
+  return (
     <Box maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Box display="flex" justifyContent="flex-end" 
-      visibility={roles.includes("STAFF") || roles.includes("ADMIN") ? "visible" : "hidden"}>
-        <Button 
-            variant="contained"
-            component={Link}
-            color="primary"
-            to="/technicians/create"
-            style={{ marginBottom: "1rem" }}
-            >
-          Novo cadastro
-        </Button>
-      </Box>
-
-      <TechnicianTable
+      <CustomerTable
       data={data}
       isFetching={isFetching}
       perPage={options.perPage}

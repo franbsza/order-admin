@@ -1,17 +1,25 @@
-import { Box, Typography} from '@mui/material';
+import { Box, Button, Typography} from '@mui/material';
+import { selectRoles, selectUserDetails } from "../features/auth/SliceAuth";
+import { useAppSelector } from '../app/hooks';
+import { useGetCustomerByEmailQuery } from '../features/customers/SliceCustomer';
+import { Link } from 'react-router-dom';
 
 let displayName = "";
-const user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user") || "") : null;
-if(user && user.name){
-  const names = user.name.split(" ");
-  if(names.length > 1){
-  let firstName = names[0].charAt(0).toUpperCase() + names[0].slice(1);
-  let lastName = names[1].charAt(0).toUpperCase() + names[1].slice(1);
-  displayName = firstName + " " + lastName;
-  }
-}
 
 export const Home = () => {
+    const userDetails = useAppSelector(selectUserDetails);
+    const email = userDetails.email;
+    const roles = useAppSelector(selectRoles) as string[];
+    const { error, isLoading } = useGetCustomerByEmailQuery({ email });
+
+  if(userDetails){
+    displayName = userDetails.name;
+  }
+
+  if(isLoading){
+    return <h1>Loading...</h1>
+  }
+
     return (
         <Box p={2}>
               <Typography  
@@ -21,6 +29,20 @@ export const Home = () => {
               color={"primary"}>
                 Bem-vindo(a) {" " + displayName} 
               </Typography>
-          </Box>
+        <Box p={2}></Box>
+
+        <Box display="flex" justifyContent="center" 
+        visibility={error && roles.includes("USER") ? "visible" : "hidden"}>
+            <Button 
+            variant="contained"
+            component={Link}
+            color="primary"
+            to="/customers/create"
+            style={{ marginBottom: "1rem" }}
+            >
+            Complete seu cadastro
+            </Button>
+        </Box>
+      </Box>
     )
 };

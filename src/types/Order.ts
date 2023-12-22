@@ -27,6 +27,7 @@ export interface OrderDto {
   dateTime: Date;
   description: null | String;
   expertTechnicianName: String;
+  email: String;
 }
 
 export interface OrderRequest {

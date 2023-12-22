@@ -1,4 +1,4 @@
-import { Technician, TechnicianParams, TechnicianResponse } from '../../types/Technician';
+import { TechnicianDto, TechnicianParams, TechnicianResponse } from '../../types/Technician';
 import { apiSlice } from '../api/apiSlice';
 
 const endpointUrl = "/technicians";
@@ -8,9 +8,25 @@ function getTechnicians({page=0, perPage=10, email=""}){
     return `${endpointUrl}?${parseQueryParams(params)}`
 }
 
-function getTechnicianById({ id }: { id: number }) {
+function getTechnicianById({ id }: { id: string }) {
     return `${endpointUrl}/${id}`;
 }
+
+function createTechnicianMutation(request: TechnicianDto) {
+    return { 
+        url: endpointUrl, 
+        method: "POST", 
+        body: request 
+    };
+  }
+
+  function updateTechnicianMutation(technician: TechnicianDto) {
+    return {
+      url: `${endpointUrl}/${technician.id}`,
+      method: "PUT",
+      body: technician,
+    };
+  }
 
 function parseQueryParams(params: TechnicianParams){
     const query = new URLSearchParams();
@@ -24,27 +40,30 @@ function parseQueryParams(params: TechnicianParams){
     return query.toString();
 }
 
-function cancelTechnicianMutation({ id }: { id: string}) {
-    return {
-      url: `${endpointUrl}/${id}`,
-      method: "DELETE",
-    };
-}
-
 export const techniciansApiSlice = apiSlice.injectEndpoints({
     endpoints: ({query, mutation}) => ({
         getTechnicians: query<TechnicianResponse, TechnicianParams>({
             query: getTechnicians,
             providesTags: ["Technicians"]
         }),
-        getTechnicianById: query<Technician, { id: number }>({
+        getTechnicianById: query<TechnicianDto, { id: string }>({
             query: getTechnicianById,
             providesTags: ["Technicians"],
-        })
+        }),
+        createTechnician: mutation<TechnicianResponse, TechnicianDto>({
+            query: createTechnicianMutation,
+            invalidatesTags: ["Technicians"]
+        }),
+        updateTechnician: mutation<TechnicianResponse, TechnicianDto>({
+            query: updateTechnicianMutation,
+            invalidatesTags: ["Technicians"],
+        }),
     }),
 }); 
 
 export const {
     useGetTechniciansQuery,
     useGetTechnicianByIdQuery,
+    useCreateTechnicianMutation,
+    useUpdateTechnicianMutation
 } = techniciansApiSlice

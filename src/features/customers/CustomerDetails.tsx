@@ -3,18 +3,18 @@ import { Box, Typography, Paper, TextField, Grid, FormControl, Button} from '@mu
 import { FormHelperText } from '@mui/material';
 import { Link } from "react-router-dom";
 import { Empty } from "../../components/Empty";
-import { useGetCustomerByIdQuery } from "./SliceCustomer";
+import { useGetCustomerByEmailQuery } from "./SliceCustomer";
 
 export const CustomerDetails = () => {
 
-    let email = JSON.parse(localStorage.getItem("user") || "").email;
-    const { data: customer , error: errOrder, isLoading } = useGetCustomerByIdQuery({ email });
+    const email = useParams().email as string;
+    const { data: customer , error, isLoading } = useGetCustomerByEmailQuery({ email });
 
     if(isLoading){
         return <h1>Loading...</h1>
     }
 
-    if(errOrder){
+    if(error){
         return (
             <Box>
             <Empty></Empty>
@@ -42,7 +42,7 @@ export const CustomerDetails = () => {
               textAlign="center"
               variant="h5" 
               component="h5">
-                Meus dados
+                Dados de cadastro
               </Typography>
           </Box>
           <Box>
@@ -65,7 +65,7 @@ export const CustomerDetails = () => {
                 <FormControl fullWidth >
                   <TextField
                   id="name" 
-                  type="text" 
+                  type="email" 
                   defaultValue={customer?.email} 
                   inputProps={
                     { readOnly: true }
@@ -78,10 +78,10 @@ export const CustomerDetails = () => {
                 <FormControl fullWidth >
                 <TextField
                 id="status" 
-                type="text" 
+                type="text"
                 defaultValue={ customer?.phone } 
                 inputProps={
-                  { readOnly: true }
+                  { readOnly: true}
                 } />
                 <FormHelperText>Telefone</FormHelperText>
                 </FormControl>
@@ -159,12 +159,11 @@ export const CustomerDetails = () => {
                 </FormControl>
               </Grid>
 
-
               <Grid item xs={12} sm={12} sx={{ m: 2, marginTop: 0}}>
                   <Box display="flex" gap={2} justifyContent="center">
                     <Button 
                       component={Link} 
-                      to="/"
+                      to="/customers"
                       variant="contained" 
                       color="primary">
                       Back

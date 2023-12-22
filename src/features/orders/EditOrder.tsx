@@ -7,16 +7,22 @@ import { useGetVehiclesQuery } from '../vehicle/SliceVehicle';
 import { useSnackbar } from 'notistack'
 import { OrderDto} from '../../types/Order';
 import { InputError } from '../../types/InputError';
+import { selectRoles, selectUserDetails } from '../auth/SliceAuth';
+import { useAppSelector } from '../../app/hooks';
    
   export const EditOrder = () => {
   
     const id = useParams().id as string;
-    const { data: order , error: errOrder, isLoading } = useGetOrderByIdQuery({ id });
+    const { data: order , isLoading } = useGetOrderByIdQuery({ id });
     const [isDisabled, setIsDisabled] = useState(false);
-    const { data: vehicles , error: errorVehicle , isFetching} = useGetVehiclesQuery(
+    const user = useAppSelector(selectUserDetails);
+    const [isRolePermitted, setIsRolePermitted] = useState(true);
+    const roles = useAppSelector(selectRoles) as string[];
+    const { data: vehicles , isFetching} = useGetVehiclesQuery(
       { 
         page: 0, 
-        perPage: 10
+        perPage: 10,
+        email: user.email === order?.email ? user.email : order?.email 
       }
     );
     const [updateOrder, status] = useUpdateOrderMutation();
@@ -49,7 +55,8 @@ import { InputError } from '../../types/InputError';
       period: "", 
       dateTime: new Date(),
       description: "",
-      expertTechnicianName: ""
+      expertTechnicianName: "",
+      email: order?.email || ""
     });
 
     const [inputError, setInputError] = useState<InputError>({
@@ -57,20 +64,15 @@ import { InputError } from '../../types/InputError';
         dateTimeError: false,
         periodError: false
       })
-  
+
     const { enqueueSnackbar } = useSnackbar();
   
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const { name, value } = e.target;
-      if(name === "description"){
-        setOrderState({ ...orderState, [name]: value });
-      }
-      else{
         setOrderState({ 
           ...orderState, 
           address: {...orderState.address, [name]: value }
         });
-      }
     };
   
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -79,22 +81,39 @@ import { InputError } from '../../types/InputError';
       updateOrder(orderState);
     };
   
+    //periodo e status
     const hadleSelectChange = (e: SelectChangeEvent<String>) => {
         const { name, value } = e.target;
-        setInputError({...inputError, 
-          periodError: false, 
-        });
-        if(value === ""){
-          setInputError({...inputError, periodError: true})
+        
+        if(name === "orderStatus"){
+          if((roles.includes("STAFF") || roles.includes("ADMIN"))){ 
+            setOrderState({ ...orderState, [name]: value });
+          }
+          else{
+            setIsRolePermitted(false);
+          }
         }
         else{
-          setInputError({...inputError, periodError: false})
+          setInputError({...inputError, periodError: false});
+          if(value === ""){
+            setInputError({...inputError, periodError: true})
+          }
+          else{
+            setInputError({...inputError, periodError: false})
+          }
+          setOrderState({ ...orderState, [name]: value });
         }
-        setOrderState({ ...orderState, [name]: value });
      };
+
+     useEffect(() => {
+      if (!isRolePermitted) {
+        enqueueSnackbar("Você não tem permissão para alterar o status", { variant: "error" });
+      }
+    }, [isRolePermitted, enqueueSnackbar]);
+
     
       const hadleSelectChangeNumber = (e: SelectChangeEvent<Number>) => {
-        const { name, value } = e.target;
+        const { value } = e.target;
         setInputError({...inputError, 
           vehicleIdError:false
         });
@@ -111,15 +130,14 @@ import { InputError } from '../../types/InputError';
         }
       };
     
-      const handleDateChange = (value: string | null) => {
-        const data = value === null ? new Date() : new Date(value);
-        setOrderState({ ...orderState, dateTime: data });
-      };
+    const handleDateChange = (value: string | null) => {
+      const data = value === null ? new Date() : new Date(value);
+      setOrderState({ ...orderState, dateTime: data });
+    };
   
     useEffect(() => {
       if (order) {
         setOrderState(order);
-
       }
     }, [order]);
 
@@ -153,8 +171,8 @@ import { InputError } from '../../types/InputError';
           <OrderForm
           order={orderState}
           vehicleResponse={vehicles}
-          isDisabled={isLoading}
-          isLoading={isFetching}
+          isDisabled={isDisabled}
+          isLoading={isLoading || isFetching}
           handleSubmit={handleSubmit}
           hadleChange={handleChange}
           hadleSelectChange={hadleSelectChange}

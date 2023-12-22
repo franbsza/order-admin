@@ -6,15 +6,19 @@ import { OrderDto } from '../../types/Order';
 import { useSnackbar } from 'notistack';
 import { OrderForm } from './components/OrderForm';
 import { InputError } from '../../types/InputError';
+import { useAppSelector } from '../../app/hooks';
+import { selectUserDetails } from '../auth/SliceAuth';
 
 export const CreateOrder = () => {
 
   const { enqueueSnackbar } = useSnackbar();
   const [createOrder, status] = useCreateOrderMutation();
-  const { data: vehicles , error , isFetching} = useGetVehiclesQuery(
+  const user = useAppSelector(selectUserDetails);
+  const { data: vehicles , isFetching} = useGetVehiclesQuery(
     { 
       page: 0, 
-      perPage: 10
+      perPage: 10,
+      email: user.email
     }
   );
   const [isDisabled, setIsDisabled] = useState(false);
@@ -48,7 +52,8 @@ export const CreateOrder = () => {
         period: "", 
         dateTime: new Date(),
         description: "",
-        expertTechnicianName: ""
+        expertTechnicianName: "",
+        email: user.email
   });
 
   const [inputError, setInputError] = useState<InputError>({
@@ -106,11 +111,16 @@ export const CreateOrder = () => {
     else{
       setInputError({...inputError, periodError: false})
     }
-    setOrderState({ ...orderState, [name]: value });
+    if(name === "period"){
+      setOrderState({ ...orderState, [name]: value });
+    }
+    else{
+      setOrderState({ ...orderState, [name]: "OPEN" });
+    }
  };
 
  const hadleSelectChangeNumber = (e: SelectChangeEvent<Number>) => {
-  const { name, value } = e.target;
+  const { value } = e.target;
   setInputError({...inputError, vehicleIdError:false
   });
   if(value === 0){
@@ -141,6 +151,13 @@ export const CreateOrder = () => {
     }
   }, [enqueueSnackbar, status.isSuccess, status.error]);
 
+
+  useEffect(() => {
+    if(orderState.orderStatus !== "OPEN"){
+      enqueueSnackbar("O status não pode ser alterado.", { variant: "error" });
+    }
+  }, [enqueueSnackbar, orderState.orderStatus]);
+
     if(isFetching){
       return <div>Loading...</div>
     }
@@ -160,8 +177,8 @@ export const CreateOrder = () => {
           <OrderForm
           order={orderState}
           vehicleResponse={vehicles}
-          isDisabled={isLoading}
-          isLoading={isFetching}
+          isDisabled={isDisabled}
+          isLoading={isLoading || isFetching}
           handleSubmit={handleSubmit}
           hadleChange={handleChange}
           hadleSelectChange={hadleSelectChange}

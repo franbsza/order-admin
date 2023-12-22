@@ -9,8 +9,6 @@ import {
 import { Box,IconButton } from '@mui/material';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import BlockIcon from '@mui/icons-material/Block';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import { Link } from 'react-router-dom';
 
 type Props = {
     data: VehicleResponse | undefined;
@@ -65,27 +63,16 @@ export function VehicleTable({
         },
         { 
           field: "isProtected", 
-          headerName: "Está protegido?", 
-          flex: 1        
+          headerName: "Seguro ativo?", 
+          flex: 1,
+          renderCell: renderIsProtectedCell       
         },
         { 
-          field: "detailsAction", 
-          headerName: "Detalhes", 
-          flex: 0.5 ,
-          renderCell: renderDetailsActionCell
-        },
-        { 
-          field: "editAction", 
-          headerName: "Editar", 
-          flex: 0.5 ,
-          renderCell: renderEditActionCell
-        },
-        { 
-          field: "cancelAction", 
-          headerName: "Cancelar", 
+          field: "activation", 
+          headerName: "Ativar/Desativar", 
           type: "string",
-          flex: 0.5 ,
-          renderCell: renderCancelActionCell
+          flex: 1 ,
+          renderCell: renderActivationActionCell
         },
       ];
 
@@ -101,49 +88,31 @@ export function VehicleTable({
         }));
       }
 
-      function renderDetailsActionCell(rowData: GridRenderCellParams) {
+      function renderIsProtectedCell(rowData: GridRenderCellParams) {
         return (
-
-        <Link to={`/vehicles/details/${rowData.id}`} 
-        style={{ textDecoration: "none" }}
-        >
-            <IconButton>
-              <VisibilityIcon color='info'/>
-            </IconButton>
-            </Link>
-        )
-      }
-      
-      function renderEditActionCell(rowData: GridRenderCellParams) {
-        return (
-        <Link to={`/vehicles/edit/${rowData.id}`} 
-        style={{ textDecoration: "none" }}
-        >
-            <IconButton>
-              <BorderColorIcon color='primary'/>
-            </IconButton>
-            </Link>
+          <span style={{ color: rowData.row.isProtected ? "green" : "red" }}>
+            {rowData.row.isProtected ? "Sim" : "Não"}</span>
         )
       }
 
-      function renderCancelActionCell(rowData: GridRenderCellParams) {
+      function renderActivationActionCell(rowData: GridRenderCellParams) {
         return (
           <IconButton
-          color="secondary"
           onClick={() => handleDelete(rowData.row.id)}
           aria-label="delete">
-            <BlockIcon />
+            { rowData.row.isProtected ? 
+            <BlockIcon color="secondary"/> : 
+            <BorderColorIcon color="primary" /> }
           </IconButton>
         )
       }
-    
 
       const rows = data ? mapDataToGridRows(data) : [];
       const rowCount = data?.meta.total || 0;
 
       return (
         <Box sx={{ display: 'flex', height: 500, width: '100%' }}>
-            <DataGrid
+            <DataGrid 
             rows={rows}
             pagination={true}
             columns={columns}
@@ -153,7 +122,7 @@ export function VehicleTable({
             loading={isFetching}
             paginationMode="server"
             checkboxSelection={false}
-            disableColumnFilter={false}
+            disableColumnFilter={true}
             disableColumnSelector={true}
             disableDensitySelector={true}
             rowsPerPageOptions={rowsPerPage}

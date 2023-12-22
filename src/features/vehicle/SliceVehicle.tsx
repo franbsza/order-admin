@@ -35,12 +35,10 @@ function createVehicleMutation(vehicleRequest: VehicleDto) {
     };
   }
 
-
-function updateVehicleMutation(vehicle: VehicleDto) {
+function updateVehicleMutation({ id }: { id: string}) {
     return {
-      url: `${endpointUrl}/${vehicle.id}`,
-      method: "PUT",
-      body: vehicle,
+      url: `${endpointUrl}/desactivate/${id}`,
+      method: "PUT"
     };
   }
 
@@ -65,7 +63,7 @@ export const vehiclesApiSlice = apiSlice.injectEndpoints({
             query: createVehicleMutation,
             invalidatesTags: ["Vehicles"]
         }),
-        updateVehicle: mutation<VehicleResponse, VehicleDto>({
+        updateVehicle: mutation<VehicleResponse, {id: String}>({
             query: updateVehicleMutation,
             invalidatesTags: ["Vehicles"],
         }),
